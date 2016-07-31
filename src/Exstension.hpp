@@ -5,7 +5,7 @@
 
 class Extension : public SDKExtension {
 public:
-	virtual bool SDK_OnLoad(char *error, size_t err_max, bool late);
+  virtual bool SDK_OnLoad(char *error, size_t err_max, bool late);
 };
 
 extern Extension extension;

@@ -8,16 +8,16 @@ using boost::asio::ip::tcp;
 
 class EventLoop {
 private:
-	bool listening = false;
-	boost::asio::io_service *ioService;
-	std::string apiKey;
-	tcp::acceptor *acceptor;
-	tcp::socket *socket;
-	void accept();
+  bool listening = false;
+  boost::asio::io_service *ioService;
+  std::string apiKey;
+  tcp::acceptor *acceptor;
+  tcp::socket *socket;
+  void accept();
 public:
-	EventLoop() { };
-	void Init(std::string apiKey, int port);
-	void Run();
+  EventLoop() { };
+  void Init(std::string apiKey, int port);
+  void Run();
 };
 
 extern EventLoop eventLoop;
