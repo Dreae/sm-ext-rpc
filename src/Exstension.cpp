@@ -1,11 +1,13 @@
 #include "Exstension.hpp"
 #include "RPCMethod.hpp"
+#include "EventLoop.hpp"
+#include <thread>
 
 Extension extension;
 SMEXT_LINK(&extension);
 
 void GameFrame(bool simulating) {
-
+	eventLoop.Run();
 }
 
 extern const sp_nativeinfo_t smrpc_natives[];
@@ -13,6 +15,7 @@ extern const sp_nativeinfo_t smrpc_natives[];
 bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
 	smutils->AddGameFrameHook(&GameFrame);
 	sharesys->AddNatives(myself, smrpc_natives);
+	eventLoop.Init("butts", 1337);
 	return true;
 }
 

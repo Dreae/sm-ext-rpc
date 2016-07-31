@@ -1,3 +1,6 @@
+#ifndef _RPC_RPCMethod
+#define _RPC_RPCMethod
+
 #include <memory>
 #include <vector>
 #include "sdk\smsdk_ext.h"
@@ -31,3 +34,4 @@ public:
 	bool ValidateArguments(std::unique_ptr<json> j);
 	std::unique_ptr<RPCCallResult> Call();
 };
+#endif // !_RPC_RPCMethod
