@@ -7,9 +7,9 @@ using boost::asio::ip::tcp;
 class SocketHandler : public std::enable_shared_from_this<SocketHandler> {
 private:
   tcp::socket socket;
-  char data[1024];
+  std::unique_ptr<boost::asio::streambuf> data = std::unique_ptr<boost::asio::streambuf>(new boost::asio::streambuf());
   void do_read();
-  void do_write(std::size_t length);
+  void do_write();
 
 public:
   SocketHandler(tcp::socket socket) : socket(std::move(socket)) { }
