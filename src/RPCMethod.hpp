@@ -32,7 +32,7 @@ private:
 public:
   RPCMethod(char *name, IPluginFunction *callback, ParamType returnType, std::unique_ptr<std::vector<ParamType>> paramTypes);
   bool ValidateArguments(json j);
-  std::unique_ptr<RPCCallResult> Call();
+  void Call(json params, std::function<void(json)> callback);
 };
 
 #endif // !_RPC_RPCMethod

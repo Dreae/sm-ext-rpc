@@ -7,8 +7,14 @@ RPCMethod::RPCMethod(char *name, IPluginFunction* callback, ParamType returnType
   this->returnType = returnType;
 }
 
-std::unique_ptr<RPCCallResult> RPCMethod::Call() {
-  return std::unique_ptr<RPCCallResult>(new RPCCallResult(false));
+void RPCMethod::Call(json params, std::function<void(json)> callback) {
+  this->callback->PushCell(0);
+  this->callback->PushCell(0);
+
+  cell_t result;
+  this->callback->Execute(&result);
+  
+  callback("42"_json);
 }
 
 bool RPCMethod::ValidateArguments(json j) {

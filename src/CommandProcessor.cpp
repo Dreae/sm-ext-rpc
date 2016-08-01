@@ -35,6 +35,17 @@ void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
 
         return;
       }
+
+      method->Call(j["params"], [cb, j, notification](json retval) {
+        if (!notification) {
+          json resp;
+          resp["jsonrpc"] = "2.0";
+          resp["id"] = j["id"];
+          resp["result"] = retval;
+
+          cb(std::make_shared<json>(resp));
+        }
+      });
     } else {
       cb(resp_invalid_request);
     }
