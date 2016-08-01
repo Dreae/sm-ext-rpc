@@ -9,7 +9,7 @@ private:
   tcp::socket socket;
   std::unique_ptr<boost::asio::streambuf> data = std::unique_ptr<boost::asio::streambuf>(new boost::asio::streambuf());
   void do_read();
-  void do_write();
+  void do_write(std::string response);
 
 public:
   SocketHandler(tcp::socket socket) : socket(std::move(socket)) { }

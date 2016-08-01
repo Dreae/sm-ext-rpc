@@ -1,6 +1,7 @@
 #include "Exstension.hpp"
 #include "RPCMethod.hpp"
 #include "EventLoop.hpp"
+#include "CommandProcessor.hpp"
 #include <thread>
 
 Extension extension;
@@ -40,6 +41,7 @@ cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
     paramTypes->push_back(static_cast<ParamType>(*paramType));
   }
   auto method = std::unique_ptr<RPCMethod>(new RPCMethod(methodName, callback, returnType, std::move(paramTypes)));
+  rpcCommandProcessor.RegisterRPCMethod(methodName, std::move(method));
 
   return false;
 }

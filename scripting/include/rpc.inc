@@ -9,7 +9,11 @@ enum ParameterType {
   Bool
 }
 
-native RPCRegisterMethod(char[] name, ParameterType returnType, ParameterType ...);
+funcenum RPCCallback {
+  public(function callback, any ...);
+}
+
+native RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType returnType, ParameterType ...);
 
 public Extension:__ext_smsock = {
 	name = "RPC",

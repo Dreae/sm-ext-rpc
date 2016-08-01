@@ -31,7 +31,8 @@ private:
   bool checkType(ParamType type, json j);
 public:
   RPCMethod(char *name, IPluginFunction *callback, ParamType returnType, std::unique_ptr<std::vector<ParamType>> paramTypes);
-  bool ValidateArguments(std::unique_ptr<json> j);
+  bool ValidateArguments(json j);
   std::unique_ptr<RPCCallResult> Call();
 };
+
 #endif // !_RPC_RPCMethod

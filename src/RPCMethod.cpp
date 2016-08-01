@@ -11,13 +11,13 @@ std::unique_ptr<RPCCallResult> RPCMethod::Call() {
   return std::unique_ptr<RPCCallResult>(new RPCCallResult(false));
 }
 
-bool RPCMethod::ValidateArguments(std::unique_ptr<json> j) {
-  if (j->size() != this->paramTypes->size()) {
+bool RPCMethod::ValidateArguments(json j) {
+  if (j.size() != this->paramTypes->size()) {
     return false;
   }
 
   for (unsigned int c = 0; c < this->paramTypes->size(); c++) {
-    if (!this->checkType(this->paramTypes->at(c), j->at(c))) {
+    if (!this->checkType(this->paramTypes->at(c), j.at(c))) {
       return false;
     }
   }
