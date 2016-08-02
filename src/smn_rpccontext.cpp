@@ -30,7 +30,7 @@ public:
   }
 
   void OnHandleDestroy(HandleType_t type, void *object) {
-    free(object);
+    delete reinterpret_cast<RPCContext *>(object);
   }
 
   // Used by HandleSys for reporting during Dump() and when freeing handles
