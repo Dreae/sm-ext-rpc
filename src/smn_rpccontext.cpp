@@ -7,8 +7,11 @@
   RPCContext *context; \
   sec.pOwner = pContext->GetIdentity(); \
   sec.pIdentity = myself->GetIdentity(); \
-  auto herr = handlesys->ReadHandle(hndl, g_RPCContextType, &sec, reinterpret_cast<void **>(&context));
-
+  auto herr = handlesys->ReadHandle(hndl, g_RPCContextType, &sec, reinterpret_cast<void **>(&context)); \
+  if (herr != HandleError_None) { \
+    return pContext->ThrowNativeError("Invalid RPCContext handle %x (error %d)", hndl, herr); \
+  }
+ 
 HandleType_t g_RPCContextType;
 extern const sp_nativeinfo_t smrpc_context_natives[];
 
@@ -30,20 +33,21 @@ public:
     free(object);
   }
 
+  // Used by HandleSys for reporting during Dump() and when freeing handles
+  // after detecting a memory leak
   bool GetHandleApproxSize(HandleType_t type, void *object, unsigned int *size) {
-    return false;
+    RPCContext *context = reinterpret_cast<RPCContext *>(object);
+    *size = sizeof(RPCContext) + sizeof(json) + (context->params.size() * sizeof(json));
+
+    return true;
   }
 };
 
 static RPCContextNatives natives;
 
 static cell_t native_GetParamInt(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params)
+  READ_HANDLE(pContext, params);
 
-  if (herr != HandleError_None) {
-    return pContext->ThrowNativeError("Invalid RPCContext handle %x (error %d)", hndl, herr);
-  }
-  
   try {
     return context->ReadParam<int>(params[2]);
   } catch (std::domain_error e) {
@@ -51,22 +55,88 @@ static cell_t native_GetParamInt(IPluginContext *pContext, const cell_t *params)
   }
 }
 
-static cell_t native_FinishCall(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params)
+static cell_t native_GetParamString(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
 
-  if (herr != HandleError_None) {
-    return pContext->ThrowNativeError("Invalid RPCContext handle %x (error %d)", hndl, herr);
+  try {
+    auto str = context->ReadParam<std::string>(params[2]);
+    pContext->StringToLocal(params[3], params[4], str.c_str());
+
+    return 1;
+  } catch (std::domain_error e) {
+    return pContext->ThrowNativeError("Invalid convers, parameter %d is not a string", params[2]);
   }
-  context->callback("42"_json);
+}
+
+static cell_t native_GetParamFloat(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  try {
+    return sp_ftoc(context->ReadParam<float>(params[2]));
+  } catch (std::domain_error e) {
+    return pContext->ThrowNativeError("Invalid convers, parameter %d is not a float", params[2]);
+  }
+}
+
+static cell_t native_GetParamBool(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  try {
+    return context->ReadParam<bool>(params[2]);
+  } catch (std::domain_error e) {
+    return pContext->ThrowNativeError("Invalid convers, parameter %d is not a bool", params[2]);
+  }
+}
+
+static cell_t native_FinishCall(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  context->finish();
 
   handlesys->FreeHandle(hndl, &sec);
 
   return 0;
 }
 
+static cell_t native_SetReturnInt(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  context->SetReturnValue<int>(params[2]);
+  return 0;
+}
+
+static cell_t native_SetReturnFloat(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  context->SetReturnValue<float>(sp_ctof(params[2]));
+  return 0;
+}
+
+static cell_t native_SetReturnBool(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  context->SetReturnValue<bool>(static_cast<bool>(params[2]));
+  return 0;
+}
+
+static cell_t native_SetReturnString(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *str;
+  pContext->LocalToString(params[2], &str);
+  context->SetReturnValue<std::string>(std::string(str));
+  return 0;
+}
 
 const sp_nativeinfo_t smrpc_context_natives[] = {
   {"RPCContext.GetParamInt", native_GetParamInt},
+  {"RPCContext.GetParamFloat", native_GetParamFloat},
+  {"RPCContext.GetParamString", native_GetParamString},
+  {"RPCContext.GetParamBool", native_GetParamBool},
+  {"RPCContext.SetReturnInt", native_SetReturnInt},
+  {"RPCContext.SetReturnFloat", native_SetReturnFloat},
+  {"RPCContext.SetReturnBool", native_SetReturnBool},
+  {"RPCContext.SetReturnString", native_SetReturnString},
   {"RPCContext.Done", native_FinishCall},
   {NULL, NULL}
 };

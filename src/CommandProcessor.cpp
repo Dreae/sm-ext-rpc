@@ -36,11 +36,12 @@ void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
         return;
       }
 
-      method->Call(j["params"], [cb, j, notification](json retval) {
+      auto id = j["id"];
+      method->Call(j["params"], [cb, id, notification](json retval) {
         if (!notification) {
           json resp;
           resp["jsonrpc"] = "2.0";
-          resp["id"] = j["id"];
+          resp["id"] = id;
           resp["result"] = retval;
 
           cb(std::make_shared<json>(resp));

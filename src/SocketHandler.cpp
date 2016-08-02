@@ -5,13 +5,12 @@
 
 using json = nlohmann::json;
 
-// TODO: Should SocketHandler know this much about the protocol?
+// TODO: Newline for testing, change to EOT when client code is done
 const char delimiter = '\n';
 
 void SocketHandler::do_read() {
   auto self(shared_from_this());
 
-  // TODO: Newline for testing, change to EOT when client code is done
   boost::asio::async_read_until(socket, *this->data, delimiter, [this, self](boost::system::error_code ec, std::size_t length) {
     if (!ec) {
       std::string body(boost::asio::buffer_cast<const char*>(this->data->data()), length);

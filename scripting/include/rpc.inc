@@ -12,6 +12,20 @@ enum ParameterType {
 methodmap RPCContext < Handle {
   public native int GetParamInt(int pos);
 
+  public native float GetParamFloat(int pos);
+
+  public native bool GetParamBool(int pos);
+
+  public native void GetParamString(int pos, char[] buffer, int maxlen);
+
+  public native void SetReturnInt(int value);
+
+  public native void SetReturnFloat(float value);
+
+  public native void SetReturnBool(bool value);
+
+  public native void SetReturnString(char[] value);
+
   public native void Done();
 }
 
