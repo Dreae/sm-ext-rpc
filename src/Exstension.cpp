@@ -7,6 +7,8 @@
 Extension extension;
 SMEXT_LINK(&extension);
 
+SMRPCBase *SMRPCBase::head = NULL;
+
 void GameFrame(bool simulating) {
   eventLoop.Run();
 }
@@ -17,6 +19,13 @@ bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
   smutils->AddGameFrameHook(&GameFrame);
   sharesys->AddNatives(myself, smrpc_natives);
   eventLoop.Init("butts", 1337);
+
+  SMRPCBase *head = SMRPCBase::head;
+  while(head) {
+    head->OnExtLoad();
+    head = head->next;
+  }
+
   return true;
 }
 
@@ -40,7 +49,7 @@ cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
     pContext->LocalToPhysAddr(params[c], &paramType);
     paramTypes->push_back(static_cast<ParamType>(*paramType));
   }
-  auto method = std::unique_ptr<RPCMethod>(new RPCMethod(methodName, callback, returnType, std::move(paramTypes)));
+  auto method = std::unique_ptr<RPCMethod>(new RPCMethod(methodName, pContext, callback, returnType, std::move(paramTypes)));
   rpcCommandProcessor.RegisterRPCMethod(methodName, std::move(method));
 
   return false;

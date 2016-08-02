@@ -1,20 +1,22 @@
+#include "Exstension.hpp"
 #include "RPCMethod.hpp"
+#include "RPCContext.hpp"
 
-RPCMethod::RPCMethod(char *name, IPluginFunction* callback, ParamType returnType, std::unique_ptr<std::vector<ParamType>> paramTypes) {
+RPCMethod::RPCMethod(char *name, IPluginContext *owningPlugin, IPluginFunction* callback, ParamType returnType, std::unique_ptr<std::vector<ParamType>> paramTypes) {
   this->paramTypes = std::move(paramTypes);
   this->name = std::string(name);
+  this->owningPlugin = owningPlugin;
   this->callback = callback;
   this->returnType = returnType;
 }
 
 void RPCMethod::Call(json params, std::function<void(json)> callback) {
-  this->callback->PushCell(0);
-  this->callback->PushCell(0);
+  auto context = new RPCContext(params, callback); // Free'd by SourceMod in OnHandleDestroy
+  auto hndl = handlesys->CreateHandle(g_RPCContextType, context, this->owningPlugin->GetIdentity(), myself->GetIdentity(), NULL);
+  this->callback->PushCell(hndl);
 
   cell_t result;
   this->callback->Execute(&result);
-  
-  callback("42"_json);
 }
 
 bool RPCMethod::ValidateArguments(json j) {

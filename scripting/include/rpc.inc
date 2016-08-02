@@ -9,7 +9,13 @@ enum ParameterType {
   Bool
 }
 
-typedef RPCCallback = function void (Handle context);
+methodmap RPCContext < Handle {
+  public native int GetParamInt(int pos);
+
+  public native void Done();
+}
+
+typedef RPCCallback = function void (RPCContext context);
 
 native RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
 
