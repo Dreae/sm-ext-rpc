@@ -3,10 +3,11 @@
 
 #include <string>
 #include <boost/asio.hpp>
+#include "Exstension.hpp"
 
 using boost::asio::ip::tcp;
 
-class EventLoop {
+class EventLoop : public SMRPCBase {
 private:
   bool listening = false;
   boost::asio::io_service *ioService;
@@ -18,6 +19,8 @@ public:
   EventLoop() { };
   void Init(std::string apiKey, int port);
   void Run();
+  void OnExtLoad();
+  void OnExtUnload();
 };
 
 extern EventLoop eventLoop;

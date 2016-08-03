@@ -2,31 +2,48 @@
 #include "RPCMethod.hpp"
 #include "EventLoop.hpp"
 #include "CommandProcessor.hpp"
+#include "CoreConfig.hpp"
 #include <thread>
 
 Extension extension;
 SMEXT_LINK(&extension);
 
 SMRPCBase *SMRPCBase::head = NULL;
-
-void GameFrame(bool simulating) {
-  eventLoop.Run();
-}
-
 extern const sp_nativeinfo_t smrpc_natives[];
 
 bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
-  smutils->AddGameFrameHook(&GameFrame);
   sharesys->AddNatives(myself, smrpc_natives);
-  eventLoop.Init("butts", 1337);
 
+  config.Init();
+
+  if (config.port <= 0 || config.port > 65535) {
+    strcpy_s(error, err_max, "Invalid listen port provided in configuration");
+    return false;
+  } else if (config.address == "") {
+    strcpy_s(error, err_max, "No listen address provided in configuration");
+    return false;
+  } else if (config.secret == "") {
+    strcpy_s(error, err_max, "No signing key provided in configuration");
+    return false;
+  } else {
+    eventLoop.Init(config.secret, config.port);
+
+    SMRPCBase *head = SMRPCBase::head;
+    while (head) {
+      head->OnExtLoad();
+      head = head->next;
+    }
+
+    return true;
+  }
+}
+
+void Extension::SDK_OnUnload() {
   SMRPCBase *head = SMRPCBase::head;
-  while(head) {
-    head->OnExtLoad();
+  while (head) {
+    head->OnExtUnload();
     head = head->next;
   }
-
-  return true;
 }
 
 // native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);

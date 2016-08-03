@@ -1,0 +1,9 @@
+[submodule "amtl"]
+	path = amtl
+	url = git@github.com:alliedmodders/amtl.git
+[submodule "sourcemod"]
+	path = sourcemod
+	url = git@github.com:alliedmodders/sourcemod.git
+[submodule "sourcepawn"]
+	path = sourcepawn
+	url = git@github.com:alliedmodders/sourcepawn.git

@@ -29,6 +29,10 @@ public:
     sharesys->AddNatives(myself, smrpc_context_natives);
   }
 
+  void OnExtUnload() {
+    handlesys->RemoveType(g_RPCContextType, myself->GetIdentity());
+  }
+
   void OnHandleDestroy(HandleType_t type, void *object) {
     delete reinterpret_cast<RPCContext *>(object);
   }

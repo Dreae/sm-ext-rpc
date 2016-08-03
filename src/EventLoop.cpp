@@ -1,8 +1,19 @@
 #include "EventLoop.hpp"
 #include "SocketHandler.hpp"
-#include "sdk/smsdk_ext.h"
 
 EventLoop eventLoop;
+
+void GameFrame(bool simulating) {
+  eventLoop.Run();
+}
+
+void EventLoop::OnExtLoad() {
+  smutils->AddGameFrameHook(&GameFrame);
+}
+
+void EventLoop::OnExtUnload() {
+  smutils->RemoveGameFrameHook(&GameFrame);
+}
 
 void EventLoop::Init(std::string apiKey, int port) {
   this->apiKey = apiKey;
