@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <vector>
-#include "sdk\smsdk_ext.h"
+#include "sdk/smsdk_ext.h"
 #include "json.hpp"
 
 using json = nlohmann::json;

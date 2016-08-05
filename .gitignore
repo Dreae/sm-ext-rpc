@@ -1,1 +1,10 @@
 rpc/ 
+Release/
+CMakeFiles/
+.idea/
+
+CMakeCache.txt
+cmake_install.cmake
+rpc.ext.so
+Makefile
+Makefile.bak

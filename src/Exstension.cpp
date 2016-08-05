@@ -17,13 +17,13 @@ bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
   config.Init();
 
   if (config.port <= 0 || config.port > 65535) {
-    strcpy_s(error, err_max, "Invalid listen port provided in configuration");
+    strcpy(error, "Invalid listen port provided in configuration");
     return false;
   } else if (config.address == "") {
-    strcpy_s(error, err_max, "No listen address provided in configuration");
+    strcpy(error, "No listen address provided in configuration");
     return false;
   } else if (config.secret == "") {
-    strcpy_s(error, err_max, "No signing key provided in configuration");
+    strcpy(error, "No signing key provided in configuration");
     return false;
   } else {
     eventLoop.Init(config.secret, config.port);

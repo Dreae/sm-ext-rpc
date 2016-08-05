@@ -4,7 +4,7 @@
 #include "sdk/smsdk_ext.h"
 
 #define LOG_MESSAGE(format, ...) \
-  smutils->LogMessage(myself, format, __VA_ARGS__);
+  smutils->LogMessage(myself, format, ##__VA_ARGS__);
 
 class Extension : public SDKExtension {
 public:
