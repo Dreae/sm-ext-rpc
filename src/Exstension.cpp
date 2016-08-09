@@ -65,15 +65,13 @@ cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
   char *methodName;
   pContext->LocalToString(params[1], &methodName);
 
-  auto returnType = static_cast<ParamType>(params[3]);
-
   auto paramTypes = std::unique_ptr<std::vector<ParamType>>(new std::vector<ParamType>());
-  for (int c = 4; c < paramCount + 1; c++) {
+  for (int c = 3; c < paramCount + 1; c++) {
     cell_t *paramType;
     pContext->LocalToPhysAddr(params[c], &paramType);
     paramTypes->push_back(static_cast<ParamType>(*paramType));
   }
-  auto method = std::unique_ptr<RPCMethod>(new RPCMethod(methodName, pContext, callback, returnType, std::move(paramTypes)));
+  auto method = std::unique_ptr<RPCMethod>(new RPCMethod(methodName, pContext, callback, std::move(paramTypes)));
   rpcCommandProcessor.RegisterRPCMethod(methodName, std::move(method));
 
   return false;

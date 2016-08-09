@@ -26,7 +26,23 @@ methodmap RPCContext < Handle {
 
   public native void SetReturnString(char[] value);
 
+  public native void SetReturnJSON(JSON value);
+
   public native void Done();
+}
+
+methodmap JSON < Handle {
+  public native JSON();
+
+  public native void SetInt(char[] key, int value);
+
+  public native void SetFloat(char[] key, float value);
+
+  public native void SetBool(char[] key, bool value);
+
+  public native void SetString(char[] key, char[] value);
+
+  public native void SetJSON(char[] key, JSON value);
 }
 
 typedef RPCCallback = function void (RPCContext context);

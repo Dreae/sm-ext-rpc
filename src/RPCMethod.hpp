@@ -27,11 +27,10 @@ private:
   std::string name;
   IPluginFunction *callback;
   IPluginContext *owningPlugin;
-  ParamType returnType;
 
   bool checkType(ParamType type, json j);
 public:
-  RPCMethod(char *name, IPluginContext *owningPlugin, IPluginFunction *callback, ParamType returnType, std::unique_ptr<std::vector<ParamType>> paramTypes);
+  RPCMethod(char *name, IPluginContext *owningPlugin, IPluginFunction *callback, std::unique_ptr<std::vector<ParamType>> paramTypes);
   bool ValidateArguments(json j);
   void Call(json params, std::function<void(json)> callback);
 };

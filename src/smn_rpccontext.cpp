@@ -1,5 +1,6 @@
 #include "Exstension.hpp"
 #include "RPCContext.hpp"
+#include "rpc_handletypes.hpp"
 
 #define READ_HANDLE(pContext, params) \
   Handle_t hndl = static_cast<Handle_t>(params[1]); \
@@ -132,6 +133,25 @@ static cell_t native_SetReturnString(IPluginContext *pContext, const cell_t *par
   return 0;
 }
 
+static cell_t native_SetReturnJSON(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  Handle_t hndl2 = static_cast<Handle_t>(params[3]); 
+  HandleSecurity sec2;
+  json *obj2;
+  sec2.pOwner = pContext->GetIdentity();
+  sec2.pIdentity = myself->GetIdentity();
+  auto herr2 = handlesys->ReadHandle(hndl2, g_JSONType, &sec2, reinterpret_cast<void **>(&obj2));
+  if (herr2 != HandleError_None) {
+    return pContext->ThrowNativeError("Invalid JSON handle %x (error %d)", hndl2, herr2);
+  }
+
+  char *key;
+  pContext->LocalToString(params[2], &key);
+  context->SetReturnValue<json>(*obj2);
+  return 1;
+}
+
 const sp_nativeinfo_t smrpc_context_natives[] = {
   {"RPCContext.GetParamInt", native_GetParamInt},
   {"RPCContext.GetParamFloat", native_GetParamFloat},
@@ -141,6 +161,7 @@ const sp_nativeinfo_t smrpc_context_natives[] = {
   {"RPCContext.SetReturnFloat", native_SetReturnFloat},
   {"RPCContext.SetReturnBool", native_SetReturnBool},
   {"RPCContext.SetReturnString", native_SetReturnString},
+  {"RPCContext.SetReturnJSON", native_SetReturnJSON},
   {"RPCContext.Done", native_FinishCall},
   {NULL, NULL}
 };
