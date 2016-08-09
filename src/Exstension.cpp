@@ -3,6 +3,7 @@
 #include "EventLoop.hpp"
 #include "CommandProcessor.hpp"
 #include "CoreConfig.hpp"
+#include "Server.hpp"
 #include <thread>
 
 Extension extension;
@@ -27,6 +28,12 @@ bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
     return false;
   } else {
     eventLoop.Init(config.secret, config.port);
+    for (auto n : config.servers) {
+      auto server = std::make_shared<Server>(n.second->address, n.second->port);
+      server->Connect();
+      eventLoop.RegisterService(server);
+    }
+
 
     SMRPCBase *head = SMRPCBase::head;
     while (head) {

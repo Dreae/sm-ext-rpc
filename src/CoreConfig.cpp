@@ -20,7 +20,6 @@ void CoreConfig::Init() {
 
   try {
     json config = json::parse(body);
-    LOG_MESSAGE("Parsed body");
     if (config["servers"].is_null()) {
       LOG_MESSAGE("WARNING - No servers configured");
     } else if (!config["servers"].is_object()) {

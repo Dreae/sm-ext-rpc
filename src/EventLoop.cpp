@@ -23,6 +23,10 @@ void EventLoop::Init(std::string apiKey, int port) {
   this->accept();
 }
 
+void EventLoop::RegisterService(std::shared_ptr<IOService> service) {
+  this->services.push_back(service);
+}
+
 void EventLoop::accept() {
   this->acceptor->async_accept(*this->socket, [this](boost::system::error_code ec) {
     if (!ec) {
@@ -36,4 +40,7 @@ void EventLoop::accept() {
 
 void EventLoop::Run() {
   this->ioService->poll();
+  for (auto service : this->services) {
+    service->Run();
+  }
 }
