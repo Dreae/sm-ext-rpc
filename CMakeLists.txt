@@ -12,7 +12,8 @@ set(SOURCE_FILES
         src/RPCContext.cpp
         src/RPCMethod.cpp
         src/smn_rpccontext.cpp
-        src/SocketHandler.cpp)
+        src/SocketHandler.cpp
+        src/Server.cpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -D_LINUX -DSOURCEMOD_BUILD -fno-strict-aliasing -m32")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -funroll-loops -s")
