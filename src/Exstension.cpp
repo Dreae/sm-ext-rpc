@@ -71,8 +71,8 @@ cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
     pContext->LocalToPhysAddr(params[c], &paramType);
     paramTypes->push_back(static_cast<ParamType>(*paramType));
   }
-  auto method = std::unique_ptr<RPCMethod>(new RPCMethod(methodName, pContext, callback, std::move(paramTypes)));
-  rpcCommandProcessor.RegisterRPCMethod(methodName, std::move(method));
+  auto method = std::make_shared<RPCMethod>(methodName, pContext, callback, std::move(paramTypes));
+  rpcCommandProcessor.RegisterRPCMethod(methodName, method);
 
   return false;
 }

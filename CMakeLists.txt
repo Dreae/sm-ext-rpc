@@ -14,7 +14,8 @@ set(SOURCE_FILES
         src/smn_rpccontext.cpp
         src/SocketHandler.cpp
         src/Server.cpp
-        src/smn_json.cpp)
+        src/smn_json.cpp
+        src/RPCCall.cpp src/smn_rpccall.cpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -D_LINUX -DSOURCEMOD_BUILD -fno-strict-aliasing -m32")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -funroll-loops -s")
@@ -28,5 +29,5 @@ link_directories(/home/dreae/Downloads/boost_1_61_0/stage/lib)
 
 add_library(rpc.ext SHARED ${SOURCE_FILES})
 
-target_link_libraries(rpc.ext -Wl,--no-undefined -Wl,-Bstatic -static-libgcc -lboost_thread -lboost_system -lstdc++ -Wl,-Bdynamic -lm)
+target_link_libraries(rpc.ext -lpthread -Wl,--no-undefined -Wl,-Bstatic -static-libgcc -lboost_thread -lboost_system -lstdc++ -Wl,-Bdynamic -lm)
 set_target_properties(rpc.ext PROPERTIES PREFIX "")
