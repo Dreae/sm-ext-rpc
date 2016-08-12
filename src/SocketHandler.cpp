@@ -2,16 +2,11 @@
 #include "sdk/smsdk_ext.h"
 #include <json.hpp>
 #include "CommandProcessor.hpp"
-#include "Exstension.hpp"
 
 using json = nlohmann::json;
 
-// TODO: Newline for testing, change to EOT when client code is done
-const char delimiter = '\n';
-
 void SocketHandler::do_read() {
   auto self(shared_from_this());
-
   boost::asio::async_read_until(socket, *this->data, PACKET_TERMINATOR, [this, self](boost::system::error_code ec, std::size_t length) {
     if (!ec) {
       std::string body(boost::asio::buffer_cast<const char*>(this->data->data()), length);

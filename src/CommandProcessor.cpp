@@ -6,6 +6,20 @@ void CommandProcessor::RegisterRPCMethod(std::string name, std::shared_ptr<RPCMe
   this->methods[name] = method;
 }
 
+void CommandProcessor::RegisterServer(std::string name, std::shared_ptr<Server> server) {
+  this->servers[name] = server;
+}
+
+RPCReqResult CommandProcessor::SendRequest(std::string target, json req) {
+  auto server = this->servers[target];
+  if(!server) {
+    return RPCReqResult_UnknownServer;
+  }
+
+  server->Send(req.dump());
+  return RPCReqResult_Sent;
+}
+
 void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
   try {
     auto j = json::parse(req);

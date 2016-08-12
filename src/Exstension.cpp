@@ -30,8 +30,9 @@ bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
     eventLoop.Init(config.secret, config.port);
     for (auto n : config.servers) {
       auto server = std::make_shared<Server>(n.second->address, n.second->port);
-      server->Connect();
+      server->Connect(nullptr);
       eventLoop.RegisterService(server);
+      rpcCommandProcessor.RegisterServer(n.first, server);
     }
 
 
@@ -55,7 +56,7 @@ void Extension::SDK_OnUnload() {
 
 // native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
 cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
-  auto callback = pContext->GetFunctionById(params[2]);
+  auto callback = pContext->GetFunctionById((funcid_t)params[2]);
   if (!callback) {
     pContext->ThrowNativeError("Invalid RPC callback specified");
   }

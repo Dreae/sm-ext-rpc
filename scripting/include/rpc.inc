@@ -46,13 +46,17 @@ methodmap JSON < Handle {
 }
 
 methodmap RPCCall < Handle {
-  public native RPCCall();
+  public native RPCCall(RPCCallback callback);
 
-  public native Send(char[] server);
+  public native void SetMethod(char[] method);
 
-  public native Broadcast();
+  public native void SetParamsJSON(JSON params);
 
-  public native SetNotification(bool notification);
+  public native void Notify(char[] server);
+
+  public native void Send(char[] server);
+
+  public native void Broadcast();
 }
 
 typedef RPCCallback = function void (RPCContext context);

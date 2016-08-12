@@ -53,10 +53,7 @@ public:
 static RPCCallNatives natives;
 
 static cell_t native_CreateRPCCall(IPluginContext *pContext, const cell_t *params) {
-  char *server;
-  pContext->LocalToString(params[1], &server);
-
-  auto callback = pContext->GetFunctionById((funcid_t)params[2]);
+  auto callback = pContext->GetFunctionById((funcid_t)params[1]);
   if (!callback) {
     pContext->ThrowNativeError("Invalid RPC callback specified");
   }
@@ -67,10 +64,13 @@ static cell_t native_CreateRPCCall(IPluginContext *pContext, const cell_t *param
   return hndl;
 }
 
-static cell_t native_RPCCallSetNotification(IPluginContext *pContext, const cell_t *params) {
+static cell_t native_RPCCallSetMethod(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
 
-  obj->notification = true;
+  char *method;
+  pContext->LocalToString(params[2], &method);
+
+  obj->SetMethod(std::string(method));
   return 1;
 }
 
@@ -81,6 +81,16 @@ static cell_t native_RPCCallSend(IPluginContext *pContext, const cell_t *params)
   pContext->LocalToString(params[2], &server);
 
   obj->Send(std::string(server));
+  return 1;
+}
+
+static cell_t native_RPCCallNotify(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *server;
+  pContext->LocalToString(params[2], &server);
+
+  obj->Notify(std::string(server));
   return 1;
 }
 
@@ -110,9 +120,10 @@ static cell_t native_RPCCallSetParamsJSON(IPluginContext *pContext, const cell_t
 
 const sp_nativeinfo_t rpc_call_natives[] = {
   {"RPCCall.RPCCall", native_CreateRPCCall},
-  {"RPCCall.SetNotification", native_RPCCallSetNotification},
+  {"RPCCall.SetMethod", native_RPCCallSetMethod},
   {"RPCCall.SetParamsJSON", native_RPCCallSetParamsJSON},
   {"RPCCall.Send", native_RPCCallSend},
   {"RPCCall.Broadcast", native_RPCCallBroadcast},
+  {"RPCCall.Notify", native_RPCCallNotify},
   {NULL, NULL}
 };
