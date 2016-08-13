@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "CommandProcessor.hpp"
 
 Server::Server(std::string address, int port) {
   this->port = port;
@@ -51,6 +52,22 @@ void Server::Send(std::string msg) {
         }
     });
   }
+}
+
+void Server::do_read() {
+  auto self(shared_from_this());
+  boost::asio::async_read_until(socket, *this->data, PACKET_TERMINATOR, [this, self](boost::system::error_code ec, std::size_t length) {
+      if (!ec) {
+        std::string body(boost::asio::buffer_cast<const char*>(this->data->data()), length);
+
+        rpcCommandProcessor.HandleReply(body);
+
+        this->data = std::unique_ptr<boost::asio::streambuf>(new boost::asio::streambuf());
+        this->do_read();
+      } else {
+        smutils->LogError(myself, "Boost error: %s", ec.message());
+      }
+  });
 }
 
 void Server::Run() {

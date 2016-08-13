@@ -20,6 +20,10 @@ RPCReqResult CommandProcessor::SendRequest(std::string target, json req) {
   return RPCReqResult_Sent;
 }
 
+void CommandProcessor::HandleReply(std::string body) {
+
+}
+
 void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
   try {
     auto j = json::parse(req);

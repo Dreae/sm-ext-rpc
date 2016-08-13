@@ -12,6 +12,9 @@ private:
   int port;
   std::string address;
   bool connected = false;
+
+  std::unique_ptr<boost::asio::streambuf> data = std::unique_ptr<boost::asio::streambuf>(new boost::asio::streambuf());
+  void do_read();
 public:
   Server(std::string address, int port);
   void Send(std::string msg);

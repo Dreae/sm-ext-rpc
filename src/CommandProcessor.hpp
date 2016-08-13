@@ -25,6 +25,7 @@ private:
 public:
   void RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method);
   void HandleRequest(std::string body, request_callback callback);
+  void HandleReply(std::string body);
   void RegisterServer(std::string name, std::shared_ptr<Server> server);
   RPCReqResult SendRequest(std::string target, json req);
 };
