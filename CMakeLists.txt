@@ -24,8 +24,8 @@ set(CMAKE_CXX_COMPILER gcc)
 set(CMAKE_SKIP_BUILD_RPATH true)
 set(CMAKE_VERBOSE_MAKEFILE false)
 
-include_directories(include sourcemod/public sourcepawn/include amtl)
-link_directories(/home/dreae/Downloads/boost_1_61_0/stage/lib)
+include_directories(include sourcemod/public sourcepawn/include amtl $ENV{BOOST_DIR}/boost)
+link_directories($ENV{BOOST_DIR}/stage/lib)
 
 add_library(rpc.ext SHARED ${SOURCE_FILES})
 
