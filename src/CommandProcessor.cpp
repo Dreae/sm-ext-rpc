@@ -21,7 +21,18 @@ RPCReqResult CommandProcessor::SendRequest(std::string target, json req) {
 }
 
 void CommandProcessor::HandleReply(std::string body) {
+  try {
+    auto j = json::parse(body);
+    if(j.is_array()) {
 
+    } else if(j.is_object()) {
+      if(!j["id"].is_null() && j["id"].is_string()) {
+        std::string id = j["id"];
+      }
+    }
+  } catch(std::invalid_argument e) {
+    smutils->LogError(myself, "Error parsing RPC reply: %s", e.what());
+  }
 }
 
 void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
