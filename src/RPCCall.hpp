@@ -14,10 +14,14 @@ private:
   IPluginFunction *callback;
   json *args;
   std::string id;
+  Handle_t handle;
 public:
   RPCCall(IPluginFunction *callback);
   void SetMethod(std::string method);
+  std::string GetId();
+  void SetHandle(Handle_t handle);
   void SetArgsJSON(json *j);
+  void HandleReply(json *res);
   void Send(std::string server);
   void Notify(std::string server);
   void Broadcast();

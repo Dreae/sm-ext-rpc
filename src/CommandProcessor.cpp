@@ -10,12 +10,13 @@ void CommandProcessor::RegisterServer(std::string name, std::shared_ptr<Server> 
   this->servers[name] = server;
 }
 
-RPCReqResult CommandProcessor::SendRequest(std::string target, json req) {
+RPCReqResult CommandProcessor::SendRequest(std::string target, json req, RPCCall *call) {
   auto server = this->servers[target];
   if(!server) {
     return RPCReqResult_UnknownServer;
   }
 
+  this->outstandingCalls[call->GetId()] = call;
   server->Send(req.dump());
   return RPCReqResult_Sent;
 }
@@ -24,10 +25,27 @@ void CommandProcessor::HandleReply(std::string body) {
   try {
     auto j = json::parse(body);
     if(j.is_array()) {
-
+      for(auto i = j.begin(); i != j.end(); i++) {
+        auto reply = *i;
+        if(!reply["id"].is_null() && reply["id"].is_string()) {
+          std::string id = reply["id"];
+          try {
+            auto call = this->outstandingCalls[id];
+            call->HandleReply(&reply);
+          } catch(std::out_of_range e) {
+            smutils->LogError(myself, "Got reply, but there is no record for request id %s", id.c_str());
+          }
+        }
+      }
     } else if(j.is_object()) {
       if(!j["id"].is_null() && j["id"].is_string()) {
         std::string id = j["id"];
+        try {
+          auto call = this->outstandingCalls[id];
+          call->HandleReply(&j);
+        } catch(std::out_of_range e) {
+          smutils->LogError(myself, "Got reply, but there is no record for request id %s", id.c_str());
+        }
       }
     }
   } catch(std::invalid_argument e) {

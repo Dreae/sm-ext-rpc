@@ -65,6 +65,10 @@ void Server::do_read() {
         this->do_read();
       } else {
         smutils->LogError(myself, "Boost error: %s", ec.message());
+        if((boost::asio::error::eof == ec) || (boost::asio::error::connection_reset == ec)) {
+          this->connected = false;
+          this->socket->close();
+        }
       }
   });
 }
