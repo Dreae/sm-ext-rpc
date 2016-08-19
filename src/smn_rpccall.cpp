@@ -61,6 +61,7 @@ static cell_t native_CreateRPCCall(IPluginContext *pContext, const cell_t *param
   auto rpcCall = new RPCCall(callback);
   auto hndl = handlesys->CreateHandle(g_RPCCallType, rpcCall, pContext->GetIdentity(), myself->GetIdentity(), NULL);
 
+  rpcCall->SetHandle(hndl);
   return hndl;
 }
 

@@ -20,6 +20,7 @@ class CommandProcessor {
 private:
   std::unordered_map<std::string, std::shared_ptr<RPCMethod>> methods;
   std::unordered_map<std::string, std::shared_ptr<Server>> servers;
+  std::unordered_map<std::string, RPCCall *> outstandingCalls;
 
   std::shared_ptr<json> respError(int code, std::string message, json id);
 public:
@@ -27,7 +28,7 @@ public:
   void HandleRequest(std::string body, request_callback callback);
   void HandleReply(std::string body);
   void RegisterServer(std::string name, std::shared_ptr<Server> server);
-  RPCReqResult SendRequest(std::string target, json req);
+  RPCReqResult SendRequest(std::string target, json req, RPCCall *call);
 };
 
 extern CommandProcessor rpcCommandProcessor;
