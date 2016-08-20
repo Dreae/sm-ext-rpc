@@ -48,8 +48,8 @@ void RPCCall::Notify(std::string server) {
 }
 
 void RPCCall::HandleReply(json *res) {
-  auto reply = (*res)["result"];
-  auto hndl = handlesys->CreateHandle(g_JSONType, &reply, this->callback->GetParentContext()->GetIdentity(), myself->GetIdentity(), NULL);
+  json *reply = new json((*res)["result"]);
+  auto hndl = handlesys->CreateHandle(g_JSONType, reply, this->callback->GetParentContext()->GetIdentity(), myself->GetIdentity(), NULL);
   this->callback->PushCell(hndl);
   this->callback->Execute(nullptr);
 

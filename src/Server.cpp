@@ -32,6 +32,7 @@ void Server::Connect(std::function<void()> callback) {
           if(callback) {
             callback();
           }
+          this->do_read();
         }
       });
     }

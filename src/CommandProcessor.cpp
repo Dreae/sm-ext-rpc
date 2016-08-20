@@ -41,7 +41,7 @@ void CommandProcessor::HandleReply(std::string body) {
       if(!j["id"].is_null() && j["id"].is_string()) {
         std::string id = j["id"];
         try {
-          auto call = this->outstandingCalls[id];
+          auto call = this->outstandingCalls.at(id);
           call->HandleReply(&j);
         } catch(std::out_of_range e) {
           smutils->LogError(myself, "Got reply, but there is no record for request id %s", id.c_str());
