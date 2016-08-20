@@ -118,6 +118,47 @@ static cell_t native_SetJSON_JSON(IPluginContext *pContext, const cell_t *params
   return 1;
 }
 
+static cell_t native_GetJSONInt(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *key;
+  pContext->LocalToString(params[2], &key);
+
+  int res = (*obj)[key];
+  return res;
+}
+
+static cell_t native_GetJSONFloat(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *key;
+  pContext->LocalToString(params[2], &key);
+
+  float res = (*obj)[key];
+  return sp_ftoc(res);
+}
+
+static cell_t native_GetJSONBool(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *key;
+  pContext->LocalToString(params[2], &key);
+
+  bool res = (*obj)[key];
+  return res;
+}
+
+static cell_t native_GetJSONString(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *key;
+  pContext->LocalToString(params[2], &key);
+
+  std::string res = (*obj)[key];
+  pContext->StringToLocal(params[3], params[4], res.c_str());
+  return 1;
+}
+
 static cell_t native_CreateJSON(IPluginContext *pContext, const cell_t *params) {
   auto context = new json;
   auto hndl = handlesys->CreateHandle(g_JSONType, context, pContext->GetIdentity(), myself->GetIdentity(), NULL);
@@ -132,5 +173,9 @@ const sp_nativeinfo_t smrpc_json_natives[] = {
   { "JSON.SetBool", native_SetJSONBool },
   { "JSON.SetString", native_SetJSONString },
   { "JSON.SetJSON", native_SetJSON_JSON },
+  { "JSON.GetInt", native_GetJSONInt },
+  { "JSON.GetFloat", native_GetJSONFloat },
+  { "JSON.GetBool", native_GetJSONBool },
+  { "JSON.GetString", native_GetJSONString },
   { NULL, NULL }
 };

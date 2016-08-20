@@ -43,10 +43,18 @@ methodmap JSON < Handle {
   public native void SetString(char[] key, char[] value);
 
   public native void SetJSON(char[] key, JSON value);
+
+  public native int GetInt(char[] key);
+
+  public native float GetFloat(char[] key);
+
+  public native bool GetBool(char[] key);
+
+  public native void GetString(char[] key, char[] buffer, int maxlen);
 }
 
 methodmap RPCCall < Handle {
-  public native RPCCall(RPCCallback callback);
+  public native RPCCall(RPCReplyCallback callback);
 
   public native void SetMethod(char[] method);
 
@@ -60,6 +68,7 @@ methodmap RPCCall < Handle {
 }
 
 typedef RPCCallback = function void (RPCContext context);
+typedef RPCReplyCallback = function void (JSON result);
 
 native RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
 
