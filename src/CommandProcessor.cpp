@@ -1,6 +1,11 @@
 #include "CommandProcessor.hpp"
+#include "Crypto.hpp"
 
 CommandProcessor rpcCommandProcessor;
+
+void CommandProcessor::Init(std::string apiKey) {
+  this->apiKey = apiKey;
+}
 
 void CommandProcessor::RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method) {
   this->methods[name] = method;
@@ -17,6 +22,9 @@ RPCReqResult CommandProcessor::SendRequest(std::string target, json req, RPCCall
   }
 
   this->outstandingCalls[call->GetId()] = call;
+  auto digest = Digest(req.dump(), this->apiKey);
+  req["sig"] = digest;
+
   server->Send(req.dump());
   return RPCReqResult_Sent;
 }

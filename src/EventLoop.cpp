@@ -15,8 +15,7 @@ void EventLoop::OnExtUnload() {
   smutils->RemoveGameFrameHook(&GameFrame);
 }
 
-void EventLoop::Init(std::string apiKey, int port) {
-  this->apiKey = apiKey;
+void EventLoop::Init(int port) {
   this->ioService = new boost::asio::io_service();
   this->socket = new boost::asio::ip::tcp::socket(*this->ioService);
   this->acceptor = new boost::asio::ip::tcp::acceptor(*this->ioService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port));

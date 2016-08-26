@@ -18,12 +18,14 @@ typedef std::function<void(std::shared_ptr<json>)> request_callback;
 
 class CommandProcessor {
 private:
+  std::string apiKey;
   std::unordered_map<std::string, std::shared_ptr<RPCMethod>> methods;
   std::unordered_map<std::string, std::shared_ptr<Server>> servers;
   std::unordered_map<std::string, RPCCall *> outstandingCalls;
 
   std::shared_ptr<json> respError(int code, std::string message, json id);
 public:
+  void Init(std::string apiKey);
   void RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method);
   void HandleRequest(std::string body, request_callback callback);
   void HandleReply(std::string body);
