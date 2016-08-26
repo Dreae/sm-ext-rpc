@@ -16,14 +16,13 @@ class EventLoop : public SMRPCBase {
 private:
   bool listening = false;
   boost::asio::io_service *ioService;
-  std::string apiKey;
   tcp::acceptor *acceptor;
   tcp::socket *socket;
   void accept();
   std::vector<std::shared_ptr<IOService>> services;
 public:
   EventLoop() { };
-  void Init(std::string apiKey, int port);
+  void Init(int port);
   void RegisterService(std::shared_ptr<IOService> service);
   void Run();
   void OnExtLoad();
