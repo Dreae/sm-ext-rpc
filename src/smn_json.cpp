@@ -159,6 +159,59 @@ static cell_t native_GetJSONString(IPluginContext *pContext, const cell_t *param
   return 1;
 }
 
+static cell_t native_PushJSONString(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *string;
+  pContext->LocalToString(params[2], &string);
+
+  std::string strCopy(string);
+  obj->push_back(strCopy);
+
+  return 1;
+}
+
+static cell_t native_PushJSONInt(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  obj->push_back(params[1]);
+
+  return 1;
+}
+
+static cell_t native_PushJSONFloat(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  obj->push_back(sp_ctof(params[1]));
+
+  return 1;
+}
+
+static cell_t native_PushJSONBool(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  obj->push_back(static_cast<bool>(params[1]));
+
+  return 1;
+}
+
+static cell_t native_PushJSON_JSON(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  Handle_t hndl2 = static_cast<Handle_t>(params[3]);
+  HandleSecurity sec2;
+  json *obj2;
+  sec2.pOwner = pContext->GetIdentity();
+  sec2.pIdentity = myself->GetIdentity();
+  auto herr2 = handlesys->ReadHandle(hndl2, g_JSONType, &sec2, reinterpret_cast<void **>(&obj2));
+  if (herr2 != HandleError_None) {
+    return pContext->ThrowNativeError("Invalid JSON handle %x (error %d)", hndl2, herr2);
+  }
+
+  obj->push_back(*obj2);
+  return 1;
+}
+
 static cell_t native_CreateJSON(IPluginContext *pContext, const cell_t *params) {
   auto context = new json;
   auto hndl = handlesys->CreateHandle(g_JSONType, context, pContext->GetIdentity(), myself->GetIdentity(), NULL);
@@ -177,5 +230,10 @@ const sp_nativeinfo_t smrpc_json_natives[] = {
   { "JSON.GetFloat", native_GetJSONFloat },
   { "JSON.GetBool", native_GetJSONBool },
   { "JSON.GetString", native_GetJSONString },
+  { "JSON.PushString", native_PushJSONString },
+  { "JSON.PushInt", native_PushJSONInt },
+  { "JSON.PushFloat", native_PushJSONFloat },
+  { "JSON.PushBool", native_PushJSONBool },
+  { "JSON.PushJSON", native_PushJSON_JSON },
   { NULL, NULL }
 };
