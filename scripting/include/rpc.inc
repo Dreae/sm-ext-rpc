@@ -44,6 +44,16 @@ methodmap JSON < Handle {
 
   public native void SetJSON(char[] key, JSON value);
 
+  public native void PushString(char[] value);
+
+  public native void PushInt(int value);
+
+  public native void PushFloat(float value);
+
+  public native void PushBool(bool value);
+
+  public native void PushJSON(JSON value);
+
   public native int GetInt(char[] key);
 
   public native float GetFloat(char[] key);
