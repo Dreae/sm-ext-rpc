@@ -1,5 +1,6 @@
 #include "CommandProcessor.hpp"
 #include "Crypto.hpp"
+#include <ctime>
 
 CommandProcessor rpcCommandProcessor;
 
@@ -22,8 +23,9 @@ RPCReqResult CommandProcessor::SendRequest(std::string target, json req, RPCCall
   }
 
   this->outstandingCalls[call->GetId()] = call;
-  auto digest = Digest(req.dump(), this->apiKey);
-  req["sig"] = digest;
+  req["timestamp"] = time(nullptr);
+
+  req["sig"] = this->getReqSig(&req);
 
   server->Send(req.dump());
   return RPCReqResult_Sent;
@@ -67,6 +69,26 @@ void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
     if (j.is_array()) {
 
     } else if (j.is_object()) {
+      if (j["sig"].is_null()) {
+        smutils->LogError(myself, "Bad signature for request: null");
+        return cb(resp_invalid_request);
+      } else {
+        std::string sig = j["sig"];
+        auto digest = this->getReqSig(&j);
+        if (!(sig == digest)) {
+          smutils->LogError(myself, "Bad signature for request: got %s, expected: %s", sig.c_str(), digest.c_str());
+          return cb(resp_invalid_request);
+        }
+      }
+
+      if (j["timestamp"].is_null() || !j["timestamp"].is_number_integer()) {
+        smutils->LogError(myself, "Bad timestamp for request");
+        return cb(resp_invalid_request);
+      } else if (j["timestamp"].get<int>() < (time(nullptr) - 30)) {
+        smutils->LogError(myself, "Request is too old");
+        return cb(resp_invalid_request);
+      }
+
       if (!j["params"].is_array() || !j["method"].is_string()) {
         return cb(resp_invalid_request);
       }
@@ -118,4 +140,14 @@ std::shared_ptr<json> CommandProcessor::respError(int code, std::string message,
   resp["id"] = id;
 
   return std::make_shared<json>(resp);
+}
+
+std::string CommandProcessor::getReqSig(json *req) {
+  std::stringstream ss;
+  ss << req->at("jsonrpc").get<std::string>();
+  ss << req->at("method").get<std::string>();
+  ss << req->at("params").dump();
+  ss << req->at("timestamp").get<int>();
+
+  return Digest(ss.str(), this->apiKey);
 }

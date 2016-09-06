@@ -33,7 +33,9 @@ void RPCCall::Send(std::string server) {
   req["jsonrpc"] = "2.0";
   req["id"] = this->id;
   req["method"] = this->method;
-  req["params"] = *this->args;
+  if (this->args != nullptr) {
+    req["params"] = *this->args;
+  }
 
   rpcCommandProcessor.SendRequest(server, req, this);
 }
