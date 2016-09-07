@@ -2,6 +2,7 @@
   #endinput
 #endif
 #define _rpc_included
+#define RPC_VERSION "1.0.0"
 
 enum ParameterType {
   String = 1,

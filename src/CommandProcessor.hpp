@@ -24,7 +24,9 @@ private:
   std::unordered_map<std::string, RPCCall *> outstandingCalls;
 
   std::shared_ptr<json> respError(int code, std::string message, json id);
-  std::string getReqSig(json *req);
+  std::string getReqSig(json &req);
+  std::string getReplySig(json &reply);
+  void processCommandReply(json &reply);
 public:
   void Init(std::string apiKey);
   void RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method);
