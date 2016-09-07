@@ -3,6 +3,7 @@ Release/
 CMakeFiles/
 .idea/
 
+.clang_complete
 CMakeCache.txt
 cmake_install.cmake
 rpc.ext.so
