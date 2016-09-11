@@ -8,6 +8,7 @@ boost::uuids::random_generator uuidGenerator;
 
 RPCCall::RPCCall(IPluginFunction *callback) {
   this->callback = callback;
+  this->args = std::make_shared<json>();
 }
 
 void RPCCall::SetMethod(std::string method) {
@@ -15,7 +16,7 @@ void RPCCall::SetMethod(std::string method) {
 }
 
 void RPCCall::SetArgsJSON(json *j) {
-  this->args = j;
+  this->args = std::make_shared<json>(*j);
 }
 
 std::string RPCCall::GetId() {

@@ -12,7 +12,7 @@ class RPCCall {
 private:
   std::string method;
   IPluginFunction *callback;
-  json *args;
+  std::shared_ptr<json> args;
   std::string id;
   Handle_t handle;
 public:
