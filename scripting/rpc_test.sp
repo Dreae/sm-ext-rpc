@@ -19,6 +19,7 @@ public Action rpcTest(int args) {
   JSON jArgs = new JSON();
   jArgs.PushString(argString);
   call.SetParamsJSON(jArgs);
+  jArgs.Close();
   call.Send("test");
 }
 
