@@ -11,15 +11,12 @@ extern HandleType_t g_RPCContextType;
 class RPCContext {
   friend class RPCContextNatives;
 private:
-  json params;
   json retval;
 public:
+  json params;
+
   RPCContext(json params, std::function<void(json)> callback);
   void finish();
-
-  template <typename T> T ReadParam(int pos) {
-    return this->params[pos].get<T>();
-  };
 
   template <typename T> void SetReturnValue(T val) {
     retval = val;

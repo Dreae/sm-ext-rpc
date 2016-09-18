@@ -50,47 +50,13 @@ public:
 
 static RPCContextNatives natives;
 
-static cell_t native_GetParamInt(IPluginContext *pContext, const cell_t *params) {
+static cell_t native_GetParams(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
+  auto paramsCopy = new json(context->params);
 
-  try {
-    return context->ReadParam<int>(params[2]);
-  } catch (std::domain_error e) {
-    return pContext->ThrowNativeError("Invalid conversion, parameter %d is not an int", params[2]);
-  }
-}
+  auto jsonHndle = handlesys->CreateHandle(g_JSONType, paramsCopy, pContext->GetIdentity(), myself->GetIdentity(), NULL);
 
-static cell_t native_GetParamString(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  try {
-    auto str = context->ReadParam<std::string>(params[2]);
-    pContext->StringToLocal(params[3], params[4], str.c_str());
-
-    return 1;
-  } catch (std::domain_error e) {
-    return pContext->ThrowNativeError("Invalid convers, parameter %d is not a string", params[2]);
-  }
-}
-
-static cell_t native_GetParamFloat(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  try {
-    return sp_ftoc(context->ReadParam<float>(params[2]));
-  } catch (std::domain_error e) {
-    return pContext->ThrowNativeError("Invalid convers, parameter %d is not a float", params[2]);
-  }
-}
-
-static cell_t native_GetParamBool(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  try {
-    return context->ReadParam<bool>(params[2]);
-  } catch (std::domain_error e) {
-    return pContext->ThrowNativeError("Invalid convers, parameter %d is not a bool", params[2]);
-  }
+  return jsonHndle;
 }
 
 static cell_t native_FinishCall(IPluginContext *pContext, const cell_t *params) {
@@ -100,36 +66,6 @@ static cell_t native_FinishCall(IPluginContext *pContext, const cell_t *params) 
 
   handlesys->FreeHandle(hndl, &sec);
 
-  return 0;
-}
-
-static cell_t native_SetReturnInt(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  context->SetReturnValue<int>(params[2]);
-  return 0;
-}
-
-static cell_t native_SetReturnFloat(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  context->SetReturnValue<float>(sp_ctof(params[2]));
-  return 0;
-}
-
-static cell_t native_SetReturnBool(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  context->SetReturnValue<bool>(static_cast<bool>(params[2]));
-  return 0;
-}
-
-static cell_t native_SetReturnString(IPluginContext *pContext, const cell_t *params) {
-  READ_HANDLE(pContext, params);
-
-  char *str;
-  pContext->LocalToString(params[2], &str);
-  context->SetReturnValue<std::string>(std::string(str));
   return 0;
 }
 
@@ -153,15 +89,8 @@ static cell_t native_SetReturnJSON(IPluginContext *pContext, const cell_t *param
 }
 
 const sp_nativeinfo_t smrpc_context_natives[] = {
-  {"RPCContext.GetParamInt", native_GetParamInt},
-  {"RPCContext.GetParamFloat", native_GetParamFloat},
-  {"RPCContext.GetParamString", native_GetParamString},
-  {"RPCContext.GetParamBool", native_GetParamBool},
-  {"RPCContext.SetReturnInt", native_SetReturnInt},
-  {"RPCContext.SetReturnFloat", native_SetReturnFloat},
-  {"RPCContext.SetReturnBool", native_SetReturnBool},
-  {"RPCContext.SetReturnString", native_SetReturnString},
-  {"RPCContext.SetReturnJSON", native_SetReturnJSON},
+  {"RPCContext.GetParams", native_GetParams},
+  {"RPCContext.SetReturn", native_SetReturnJSON},
   {"RPCContext.Done", native_FinishCall},
   {NULL, NULL}
 };

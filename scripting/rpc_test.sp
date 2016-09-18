@@ -18,7 +18,7 @@ public Action rpcTest(int args) {
   
   JSON jArgs = new JSON();
   jArgs.PushString(argString);
-  call.SetParamsJSON(jArgs);
+  call.SetParams(jArgs);
   call.Send("test");
 }
 
@@ -31,12 +31,15 @@ public void replyCallback(JSON result) {
 }
 
 public void commandCallback(RPCContext context) {
+  JSON params = context.GetParams();
   char message[256];
-  context.GetParamString(0, message, sizeof(message));
+  params.GetArrayString(0, message, sizeof(message));
+  params.Close();
+  
   PrintToServer("Got called by test server with message: %s", message);
   JSON ret = new JSON();
   ret.SetString("message", message);
-  context.SetReturnJSON(ret);
+  context.SetReturn(ret);
   context.Done();
 
   ret.Close();
