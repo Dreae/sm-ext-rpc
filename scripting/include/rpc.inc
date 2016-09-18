@@ -11,23 +11,9 @@ enum ParameterType {
 }
 
 methodmap RPCContext < Handle {
-  public native int GetParamInt(int pos);
+  public native JSON GetParams()
 
-  public native float GetParamFloat(int pos);
-
-  public native bool GetParamBool(int pos);
-
-  public native void GetParamString(int pos, char[] buffer, int maxlen);
-
-  public native void SetReturnInt(int value);
-
-  public native void SetReturnFloat(float value);
-
-  public native void SetReturnBool(bool value);
-
-  public native void SetReturnString(char[] value);
-
-  public native void SetReturnJSON(JSON value);
+  public native void SetReturn(JSON value);
 
   public native void Done();
 }
@@ -61,7 +47,19 @@ methodmap JSON < Handle {
 
   public native bool GetBool(char[] key);
 
+  public native JSON GetJSON(char[] key);
+
   public native void GetString(char[] key, char[] buffer, int maxlen);
+
+  public native void GetArrayString(int pos, char[] buffer, int maxlen);
+
+  public native int GetArrayInt(int pos);
+
+  public native bool GetArrayBool(int pos);
+
+  public native float GetArrayFloat(int pos);
+
+  public native JSON GetArrayJSON(int pos);
 }
 
 methodmap RPCCall < Handle {
@@ -69,7 +67,7 @@ methodmap RPCCall < Handle {
 
   public native void SetMethod(char[] method);
 
-  public native void SetParamsJSON(JSON params);
+  public native void SetParams(JSON params);
 
   public native void Notify(char[] server);
 

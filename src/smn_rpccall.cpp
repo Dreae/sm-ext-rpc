@@ -122,7 +122,7 @@ static cell_t native_RPCCallSetParamsJSON(IPluginContext *pContext, const cell_t
 const sp_nativeinfo_t rpc_call_natives[] = {
   {"RPCCall.RPCCall", native_CreateRPCCall},
   {"RPCCall.SetMethod", native_RPCCallSetMethod},
-  {"RPCCall.SetParamsJSON", native_RPCCallSetParamsJSON},
+  {"RPCCall.SetParams", native_RPCCallSetParamsJSON},
   {"RPCCall.Send", native_RPCCallSend},
   {"RPCCall.Broadcast", native_RPCCallBroadcast},
   {"RPCCall.Notify", native_RPCCallNotify},

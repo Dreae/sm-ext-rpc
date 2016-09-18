@@ -159,6 +159,20 @@ static cell_t native_GetJSONString(IPluginContext *pContext, const cell_t *param
   return 1;
 }
 
+static cell_t native_GetJSON_JSON(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  char *key;
+  pContext->LocalToString(params[2], &key);
+
+  json res = (*obj)[key];
+  auto resPtr = new json(res);
+  
+  auto jsonHndle = handlesys->CreateHandle(g_JSONType, resPtr, pContext->GetIdentity(), myself->GetIdentity(), NULL);
+
+  return jsonHndle;
+}
+
 static cell_t native_PushJSONString(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
 
@@ -212,6 +226,47 @@ static cell_t native_PushJSON_JSON(IPluginContext *pContext, const cell_t *param
   return 1;
 }
 
+static cell_t native_GetArrayString(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  int pos = params[2];
+  
+  std::string res = (*obj)[pos];
+  pContext->StringToLocal(params[3], params[4], res.c_str());
+  return 1;
+}
+
+static cell_t native_GetArrayInt(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  int res = (*obj)[params[2]];
+  return res;
+}
+
+static cell_t native_GetArrayFloat(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  float res = (*obj)[params[2]];
+  return res;
+}
+
+static cell_t native_GetArrayBool(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  bool res = (*obj)[params[2]];
+  return res;
+}
+
+static cell_t native_GetArrayJSON(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  json res = (*obj)[params[2]];
+  auto jsonCpy = new json(res);
+
+  auto jsonHndle = handlesys->CreateHandle(g_JSONType, jsonCpy, pContext->GetIdentity(), myself->GetIdentity(), NULL);
+  return jsonHndle;
+}
+
 static cell_t native_CreateJSON(IPluginContext *pContext, const cell_t *params) {
   auto context = new json;
   auto hndl = handlesys->CreateHandle(g_JSONType, context, pContext->GetIdentity(), myself->GetIdentity(), NULL);
@@ -230,10 +285,16 @@ const sp_nativeinfo_t smrpc_json_natives[] = {
   { "JSON.GetFloat", native_GetJSONFloat },
   { "JSON.GetBool", native_GetJSONBool },
   { "JSON.GetString", native_GetJSONString },
+  { "JSON.GetJSON", native_GetJSON_JSON },
   { "JSON.PushString", native_PushJSONString },
   { "JSON.PushInt", native_PushJSONInt },
   { "JSON.PushFloat", native_PushJSONFloat },
   { "JSON.PushBool", native_PushJSONBool },
   { "JSON.PushJSON", native_PushJSON_JSON },
+  { "JSON.GetArrayString", native_GetArrayString },
+  { "JSON.GetArrayInt", native_GetArrayInt },
+  { "JSON.GetArrayFloat", native_GetArrayFloat },
+  { "JSON.GetArrayBool", native_GetArrayBool },
+  { "JSON.GetArrayJSON", native_GetArrayJSON },
   { NULL, NULL }
 };

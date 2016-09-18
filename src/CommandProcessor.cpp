@@ -140,7 +140,7 @@ void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
     } else {
       cb(resp_invalid_request);
     }
-  } catch (std::invalid_argument &ex) {
+  } catch (std::invalid_argument) {
     cb(resp_parse_error);
   } catch (std::exception &ex) {
     smutils->LogError(myself, "Error handling request: %s", ex.what());
