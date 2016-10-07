@@ -16,7 +16,7 @@ void CommandProcessor::RegisterServer(std::string name, std::shared_ptr<Server> 
   this->servers[name] = server;
 }
 
-RPCReqResult CommandProcessor::SendRequest(std::string target, json req, RPCCall *call) {
+RPCReqResult CommandProcessor::SendRequest(std::string target, json &req, RPCCall *call) {
   auto server = this->servers[target];
   if(!server) {
     return RPCReqResult_UnknownServer;
@@ -29,6 +29,16 @@ RPCReqResult CommandProcessor::SendRequest(std::string target, json req, RPCCall
 
   server->Send(req.dump());
   return RPCReqResult_Sent;
+}
+
+void CommandProcessor::SendBroadcast(json &req) {
+  req["timestamp"] = time(nullptr);
+  req["sig"] = this->getReqSig(req);
+
+  auto body = req.dump();
+  for(auto it = this->servers.begin(); it != this->servers.end(); ++it) {
+    it->second->Send(body);
+  }
 }
 
 void CommandProcessor::processCommandReply(json &reply) {

@@ -33,7 +33,8 @@ public:
   void HandleRequest(std::string body, request_callback callback);
   void HandleReply(std::string body);
   void RegisterServer(std::string name, std::shared_ptr<Server> server);
-  RPCReqResult SendRequest(std::string target, json req, RPCCall *call);
+  RPCReqResult SendRequest(std::string target, json &req, RPCCall *call);
+  void SendBroadcast(json &req);
 };
 
 extern CommandProcessor rpcCommandProcessor;
