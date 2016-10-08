@@ -81,8 +81,14 @@ static cell_t native_RPCCallSend(IPluginContext *pContext, const cell_t *params)
   char *server;
   pContext->LocalToString(params[2], &server);
 
-  obj->Send(std::string(server));
-  return 1;
+  auto res = obj->Send(std::string(server)); 
+  
+  if (res == RPCReqResult_UnknownServer) {
+    pContext->ThrowNativeError("Error: Unknown Server %s", server);
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 static cell_t native_RPCCallNotify(IPluginContext *pContext, const cell_t *params) {
@@ -91,8 +97,14 @@ static cell_t native_RPCCallNotify(IPluginContext *pContext, const cell_t *param
   char *server;
   pContext->LocalToString(params[2], &server);
 
-  obj->Notify(std::string(server));
-  return 1;
+  auto res = obj->Notify(std::string(server));
+  
+  if (res == RPCReqResult_UnknownServer) {
+    pContext->ThrowNativeError("Error: Unknown Server %s", server);
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 static cell_t native_RPCCallBroadcast(IPluginContext *pContext, const cell_t *params) {

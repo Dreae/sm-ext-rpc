@@ -5,6 +5,11 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include "Exstension.hpp"
 
+enum RPCReqResult {
+  RPCReqResult_UnknownServer,
+  RPCReqResult_Sent
+};
+
 using json = nlohmann::json;
 
 class RPCCall {
@@ -22,8 +27,8 @@ public:
   void SetHandle(Handle_t handle);
   void SetArgsJSON(json *j);
   void HandleReply(json *res);
-  void Send(std::string server);
-  void Notify(std::string server);
+  RPCReqResult Send(std::string server);
+  RPCReqResult Notify(std::string server);
   void Broadcast();
 };
 

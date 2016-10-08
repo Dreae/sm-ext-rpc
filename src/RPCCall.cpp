@@ -27,7 +27,7 @@ void RPCCall::SetHandle(Handle_t handle) {
   this->handle = handle;
 }
 
-void RPCCall::Send(std::string server) {
+RPCReqResult RPCCall::Send(std::string server) {
   this->id = boost::lexical_cast<std::string>(uuidGenerator());
   
   json req;
@@ -38,16 +38,18 @@ void RPCCall::Send(std::string server) {
     req["params"] = *this->args;
   }
 
-  rpcCommandProcessor.SendRequest(server, req, this);
+  return rpcCommandProcessor.SendRequest(server, req, this);
 }
 
-void RPCCall::Notify(std::string server) {
+RPCReqResult RPCCall::Notify(std::string server) {
   json req;
   req["jsonrpc"] = "2.0";
   req["method"] = this->method;
-  req["params"] = *this->args;
+  if (this->args != nullptr) {
+    req["params"] = *this->args;
+  }
 
-  // rpcCommandProcessor.SendNotification(server, req);
+  return rpcCommandProcessor.SendRequest(server, req, nullptr);
 }
 
 void RPCCall::HandleReply(json *res) {
@@ -63,5 +65,12 @@ void RPCCall::HandleReply(json *res) {
 }
 
 void RPCCall::Broadcast() {
+  json req;
+  req["jsonrpc"] = "2.0";
+  req["method"] = this->method;
+  if (this->args != nullptr) {
+    req["params"] = *this->args;
+  }
 
+  rpcCommandProcessor.SendBroadcast(req);
 }
