@@ -22,7 +22,10 @@ RPCReqResult CommandProcessor::SendRequest(std::string target, json &req, RPCCal
     return RPCReqResult_UnknownServer;
   }
 
-  this->outstandingCalls[call->GetId()] = call;
+  if (call != nullptr) {
+    this->outstandingCalls[call->GetId()] = call;
+  }
+
   req["timestamp"] = time(nullptr);
 
   req["sig"] = this->getReqSig(req);

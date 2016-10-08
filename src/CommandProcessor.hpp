@@ -9,11 +9,6 @@
 static const std::shared_ptr<json> resp_parse_error = std::make_shared<json>("{\"jsonrpc\": \"2.0\", \"error\": {\"code\": -32700, \"message\": \"Parse error\"}, \"id\": null}"_json);
 static const std::shared_ptr<json> resp_invalid_request = std::make_shared<json>("{\"jsonrpc\": \"2.0\", \"error\": {\"code\": -32600, \"message\": \"Invalid Request\"}, \"id\": null}"_json);
 
-enum RPCReqResult {
-  RPCReqResult_UnknownServer,
-  RPCReqResult_Sent
-};
-
 typedef std::function<void(std::shared_ptr<json>)> request_callback;
 
 class CommandProcessor {
