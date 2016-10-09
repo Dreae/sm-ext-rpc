@@ -11,7 +11,7 @@ static const std::shared_ptr<json> resp_invalid_request = std::make_shared<json>
 
 typedef std::function<void(std::shared_ptr<json>)> request_callback;
 
-class CommandProcessor {
+class CommandProcessor : public SMRPCBase {
 private:
   std::string apiKey;
   std::unordered_map<std::string, std::shared_ptr<RPCMethod>> methods;
@@ -24,10 +24,12 @@ private:
   void processCommandReply(json &reply);
 public:
   void Init(std::string apiKey);
+  void OnExtLoad();
   void RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method);
   void HandleRequest(std::string body, request_callback callback);
   void HandleReply(std::string body);
   void RegisterServer(std::string name, std::shared_ptr<Server> server);
+  const std::unordered_map<std::string, std::shared_ptr<Server>>& GetServers();
   RPCReqResult SendRequest(std::string target, json &req, RPCCall *call);
   void SendBroadcast(json &req);
 };

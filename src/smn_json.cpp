@@ -267,6 +267,12 @@ static cell_t native_GetArrayJSON(IPluginContext *pContext, const cell_t *params
   return jsonHndle;
 }
 
+static cell_t native_GetArraySize(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  return obj->size();
+}
+
 static cell_t native_CreateJSON(IPluginContext *pContext, const cell_t *params) {
   auto context = new json;
   auto hndl = handlesys->CreateHandle(g_JSONType, context, pContext->GetIdentity(), myself->GetIdentity(), NULL);
@@ -296,5 +302,6 @@ const sp_nativeinfo_t smrpc_json_natives[] = {
   { "JSON.GetArrayFloat", native_GetArrayFloat },
   { "JSON.GetArrayBool", native_GetArrayBool },
   { "JSON.GetArrayJSON", native_GetArrayJSON },
+  { "JSON.GetArraySize", native_GetArraySize },
   { NULL, NULL }
 };

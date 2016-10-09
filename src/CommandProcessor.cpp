@@ -1,8 +1,10 @@
 #include "CommandProcessor.hpp"
 #include "Crypto.hpp"
 #include <ctime>
+#include "rpc_handletypes.hpp"
 
 CommandProcessor rpcCommandProcessor;
+extern const sp_nativeinfo_t smrpc_natives[];
 
 void CommandProcessor::Init(std::string apiKey) {
   this->apiKey = apiKey;
@@ -190,3 +192,54 @@ std::string CommandProcessor::getReplySig(json &reply) {
 
   return Digest(ss.str(), this->apiKey);
 }
+
+const std::unordered_map<std::string, std::shared_ptr<Server>>& CommandProcessor::GetServers() {
+  return this->servers;
+}
+
+void CommandProcessor::OnExtLoad() {
+  sharesys->AddNatives(myself, smrpc_natives);
+}
+
+// native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
+cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
+  auto callback = pContext->GetFunctionById((funcid_t)params[2]);
+  if (!callback) {
+    pContext->ThrowNativeError("Invalid RPC callback specified");
+  }
+
+  auto paramCount = params[0];
+
+  char *methodName;
+  pContext->LocalToString(params[1], &methodName);
+
+  auto paramTypes = std::unique_ptr<std::vector<ParamType>>(new std::vector<ParamType>());
+  for (int c = 3; c < paramCount + 1; c++) {
+    cell_t *paramType;
+    pContext->LocalToPhysAddr(params[c], &paramType);
+    paramTypes->push_back(static_cast<ParamType>(*paramType));
+  }
+  auto method = std::make_shared<RPCMethod>(methodName, pContext, callback, std::move(paramTypes));
+  rpcCommandProcessor.RegisterRPCMethod(methodName, method);
+
+  return false;
+}
+
+// native void RPCGetServers();
+cell_t RPCGetServers(IPluginContext *pContext, const cell_t *params) {
+  auto server_list = rpcCommandProcessor.GetServers();
+  auto servers = new json;
+  for (auto it = server_list.begin(); it != server_list.end(); ++it) {
+    servers->push_back(it->first);
+  }
+
+  auto hndl = handlesys->CreateHandle(g_JSONType, servers, pContext->GetIdentity(), myself->GetIdentity(), NULL);
+
+  return hndl;
+}
+
+const sp_nativeinfo_t smrpc_natives[] = {
+  {"RPCRegisterMethod", RPCRegisterMethod},
+  {"RPCGetServers", RPCGetServers},
+  {NULL, NULL}
+};

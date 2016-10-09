@@ -9,6 +9,13 @@ public Plugin myinfo = {
   url = "https://github.com/Dreae/sm-ext-rpc"
 }
 
+public void OnPluginStart() {
+  RegServerCmd("rpc_test", rpcTest);
+  RegServerCmd("rpc_print_servers", rpcPrintServers);
+  RegServerCmd("rpc_broadcast", rpcBroadcast);
+  RPCRegisterMethod("TestMethod", commandCallback, ParameterType:String);
+}
+
 public Action rpcTest(int args) {
   char argString[256];
   GetCmdArgString(argString, sizeof(argString));
@@ -21,6 +28,33 @@ public Action rpcTest(int args) {
   call.SetParams(jArgs);
   jArgs.Close();
   call.Send("test");
+}
+
+public Action rpcPrintServers(int args) {
+  JSON servers = RPCGetServers();
+
+  for(int i = 0; i < servers.GetArraySize(); i++) {
+    char serverName[256];
+    servers.GetArrayString(i, serverName, sizeof(serverName));
+
+    PrintToServer("Server %d: %s", i, serverName);
+  }
+
+  servers.Close();
+}
+
+public Action rpcBroadcast(int args) {
+  char argString[256];
+  GetCmdArgString(argString, sizeof(argString));
+
+  RPCCall call = new RPCCall(replyCallback);
+  call.SetMethod("TestMethod");
+  
+  JSON jArgs = new JSON();
+  jArgs.PushString(argString);
+  call.SetParams(jArgs);
+  jArgs.Close();
+  call.Broadcast();
 }
 
 public void replyCallback(JSON result) {
@@ -44,9 +78,4 @@ public void commandCallback(RPCContext context) {
   context.Done();
 
   ret.Close();
-}
-
-public void OnPluginStart() {
-  RegServerCmd("rpc_test", rpcTest);
-  RPCRegisterMethod("TestMethod", commandCallback, ParameterType:String);
 }

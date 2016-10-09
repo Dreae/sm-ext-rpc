@@ -60,6 +60,8 @@ methodmap JSON < Handle {
   public native float GetArrayFloat(int pos);
 
   public native JSON GetArrayJSON(int pos);
+
+  public native int GetArraySize();
 }
 
 methodmap RPCCall < Handle {
@@ -79,7 +81,8 @@ methodmap RPCCall < Handle {
 typedef RPCCallback = function void (RPCContext context);
 typedef RPCReplyCallback = function void (JSON result);
 
-native RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
+native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
+native JSON RPCGetServers();
 
 public Extension:__ext_smsock = {
 	name = "RPC",
