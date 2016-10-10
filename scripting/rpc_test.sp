@@ -20,14 +20,14 @@ public Action rpcTest(int args) {
   char argString[256];
   GetCmdArgString(argString, sizeof(argString));
 
-  RPCCall call = new RPCCall(replyCallback);
+  RPCCall call = new RPCCall();
   call.SetMethod("TestMethod");
   
   JSON jArgs = new JSON();
   jArgs.PushString(argString);
   call.SetParams(jArgs);
   jArgs.Close();
-  call.Send("test");
+  call.Send("test", replyCallback);
 }
 
 public Action rpcPrintServers(int args) {
@@ -47,7 +47,7 @@ public Action rpcBroadcast(int args) {
   char argString[256];
   GetCmdArgString(argString, sizeof(argString));
 
-  RPCCall call = new RPCCall(replyCallback);
+  RPCCall call = new RPCCall();
   call.SetMethod("TestMethod");
   
   JSON jArgs = new JSON();

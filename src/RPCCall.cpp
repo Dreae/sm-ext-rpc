@@ -6,9 +6,14 @@
 
 boost::uuids::random_generator uuidGenerator;
 
-RPCCall::RPCCall(IPluginFunction *callback) {
+RPCCall::RPCCall(IPluginFunction *callback, IdentityToken_t *owner) {
   this->callback = callback;
   this->args = std::make_shared<json>();
+  this->owner = owner;
+}
+
+void RPCCall::SetCallback(IPluginFunction *callback) {
+  this->callback = callback;
 }
 
 void RPCCall::SetMethod(std::string method) {
@@ -38,7 +43,10 @@ RPCReqResult RPCCall::Send(std::string server) {
     req["params"] = *this->args;
   }
 
-  return rpcCommandProcessor.SendRequest(server, req, this);
+  auto res = rpcCommandProcessor.SendRequest(server, req, this);
+  this->FreeHandle();
+
+  return res;
 }
 
 RPCReqResult RPCCall::Notify(std::string server) {
@@ -49,19 +57,21 @@ RPCReqResult RPCCall::Notify(std::string server) {
     req["params"] = *this->args;
   }
 
-  return rpcCommandProcessor.SendRequest(server, req, nullptr);
+  auto res = rpcCommandProcessor.SendRequest(server, req, nullptr);
+  this->FreeHandle();
+
+  return res;
 }
 
 void RPCCall::HandleReply(json *res) {
-  json *reply = new json((*res)["result"]);
-  auto hndl = handlesys->CreateHandle(g_JSONType, reply, this->callback->GetParentContext()->GetIdentity(), myself->GetIdentity(), NULL);
-  this->callback->PushCell(hndl);
-  this->callback->Execute(nullptr);
+  if (this->callback) {
+    json *reply = new json((*res)["result"]);
+    auto hndl = handlesys->CreateHandle(g_JSONType, reply, this->callback->GetParentContext()->GetIdentity(), myself->GetIdentity(), NULL);
+    this->callback->PushCell(hndl);
+    this->callback->Execute(nullptr);
+  }
 
-  HandleSecurity sec;
-  sec.pOwner = this->callback->GetParentContext()->GetIdentity();
-  sec.pIdentity = myself->GetIdentity();
-  handlesys->FreeHandle(this->handle, &sec);
+  this->FreeHandle();
 }
 
 void RPCCall::Broadcast() {
@@ -73,4 +83,12 @@ void RPCCall::Broadcast() {
   }
 
   rpcCommandProcessor.SendBroadcast(req);
+  this->FreeHandle();
+}
+
+void RPCCall::FreeHandle() {
+  HandleSecurity sec;
+  sec.pOwner = this->owner;
+  sec.pIdentity = myself->GetIdentity();
+  handlesys->FreeHandle(this->handle, &sec);
 }

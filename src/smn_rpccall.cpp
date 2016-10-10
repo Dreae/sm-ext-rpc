@@ -53,12 +53,7 @@ public:
 static RPCCallNatives natives;
 
 static cell_t native_CreateRPCCall(IPluginContext *pContext, const cell_t *params) {
-  auto callback = pContext->GetFunctionById((funcid_t)params[1]);
-  if (!callback) {
-    pContext->ThrowNativeError("Invalid RPC callback specified");
-  }
-
-  auto rpcCall = new RPCCall(callback);
+  auto rpcCall = new RPCCall(nullptr, pContext->GetIdentity());
   auto hndl = handlesys->CreateHandle(g_RPCCallType, rpcCall, pContext->GetIdentity(), myself->GetIdentity(), NULL);
 
   rpcCall->SetHandle(hndl);
@@ -77,6 +72,14 @@ static cell_t native_RPCCallSetMethod(IPluginContext *pContext, const cell_t *pa
 
 static cell_t native_RPCCallSend(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
+
+  auto callback = pContext->GetFunctionById((funcid_t)params[3]);
+  if (!callback) {
+    pContext->ThrowNativeError("Invalid RPC callback specified");
+    return 0;
+  }
+
+  obj->SetCallback(callback);
 
   char *server;
   pContext->LocalToString(params[2], &server);
