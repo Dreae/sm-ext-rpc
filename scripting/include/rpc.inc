@@ -21,17 +21,17 @@ methodmap RPCContext < Handle {
 methodmap JSON < Handle {
   public native JSON();
 
-  public native void SetInt(char[] key, int value);
+  public native void SetInt(const char[] key, int value);
 
-  public native void SetFloat(char[] key, float value);
+  public native void SetFloat(const char[] key, float value);
 
-  public native void SetBool(char[] key, bool value);
+  public native void SetBool(const char[] key, bool value);
 
-  public native void SetString(char[] key, char[] value);
+  public native void SetString(const char[] key, const char[] value);
 
-  public native void SetJSON(char[] key, JSON value);
+  public native void SetJSON(const char[] key, JSON value);
 
-  public native void PushString(char[] value);
+  public native void PushString(const char[] value);
 
   public native void PushInt(int value);
 
@@ -41,15 +41,15 @@ methodmap JSON < Handle {
 
   public native void PushJSON(JSON value);
 
-  public native int GetInt(char[] key);
+  public native int GetInt(const char[] key);
 
-  public native float GetFloat(char[] key);
+  public native float GetFloat(const char[] key);
 
-  public native bool GetBool(char[] key);
+  public native bool GetBool(const char[] key);
 
-  public native JSON GetJSON(char[] key);
+  public native JSON GetJSON(const char[] key);
 
-  public native void GetString(char[] key, char[] buffer, int maxlen);
+  public native void GetString(const char[] key, char[] buffer, int maxlen);
 
   public native void GetArrayString(int pos, char[] buffer, int maxlen);
 
@@ -65,15 +65,15 @@ methodmap JSON < Handle {
 }
 
 methodmap RPCCall < Handle {
-  public native RPCCall(RPCReplyCallback callback);
+  public native RPCCall();
 
-  public native void SetMethod(char[] method);
+  public native void SetMethod(const char[] method);
 
   public native void SetParams(JSON params);
 
-  public native void Notify(char[] server);
+  public native void Notify(const char[] server);
 
-  public native void Send(char[] server);
+  public native void Send(const char[] server, RPCReplyCallback callback);
 
   public native void Broadcast();
 }
@@ -81,7 +81,7 @@ methodmap RPCCall < Handle {
 typedef RPCCallback = function void (RPCContext context);
 typedef RPCReplyCallback = function void (JSON result);
 
-native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
+native void RPCRegisterMethod(const char[] name, RPCCallback callback, ParameterType ...);
 native JSON RPCGetServers();
 
 public Extension:__ext_smsock = {

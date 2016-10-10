@@ -20,11 +20,14 @@ private:
   std::shared_ptr<json> args;
   std::string id;
   Handle_t handle;
+  IdentityToken_t *owner;
 public:
-  RPCCall(IPluginFunction *callback);
+  RPCCall(IPluginFunction *callback, IdentityToken_t *owner);
   void SetMethod(std::string method);
   std::string GetId();
+  void SetCallback(IPluginFunction *callback);
   void SetHandle(Handle_t handle);
+  void FreeHandle();
   void SetArgsJSON(json *j);
   void HandleReply(json *res);
   RPCReqResult Send(std::string server);
