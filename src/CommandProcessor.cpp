@@ -26,15 +26,15 @@ void CommandProcessor::Init(std::string apiKey) {
   this->apiKey = apiKey;
 }
 
-void CommandProcessor::RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method) {
+void CommandProcessor::RegisterRPCMethod(const std::string name, std::shared_ptr<RPCMethod> method) {
   this->methods[name] = method;
 }
 
-void CommandProcessor::RegisterServer(std::string name, std::shared_ptr<Server> server) {
+void CommandProcessor::RegisterServer(const std::string name, std::shared_ptr<Server> server) {
   this->servers[name] = server;
 }
 
-RPCReqResult CommandProcessor::SendRequest(std::string target, json &req, RPCCall *call) {
+RPCReqResult CommandProcessor::SendRequest(const std::string &target, json &req, RPCCall *call) {
   auto server = this->servers[target];
   if(!server) {
     return RPCReqResult_UnknownServer;
@@ -87,7 +87,7 @@ void CommandProcessor::processCommandReply(json &reply) {
   }
 }
 
-void CommandProcessor::HandleReply(std::string body) {
+void CommandProcessor::HandleReply(const std::string &body) {
   try {
     auto j = json::parse(body);
     if(j.is_array()) {
@@ -103,7 +103,7 @@ void CommandProcessor::HandleReply(std::string body) {
   }
 }
 
-void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
+void CommandProcessor::HandleRequest(const std::string &req, request_callback cb) {
   try {
     auto j = json::parse(req);
     if (j.is_array()) {
@@ -179,7 +179,7 @@ void CommandProcessor::HandleRequest(std::string req, request_callback cb) {
   }
 }
 
-std::shared_ptr<json> CommandProcessor::respError(int code, std::string message, json id) {
+std::shared_ptr<json> CommandProcessor::respError(int code, const std::string &message, json id) {
   json resp;
   resp["jsonrpc"] = "2.0";
   resp["error"]["code"] = code;
