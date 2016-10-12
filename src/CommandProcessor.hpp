@@ -34,19 +34,19 @@ private:
   std::unordered_map<std::string, std::shared_ptr<Server>> servers;
   std::unordered_map<std::string, RPCCall *> outstandingCalls;
 
-  std::shared_ptr<json> respError(int code, std::string message, json id);
+  std::shared_ptr<json> respError(int code, const std::string &message, json id);
   std::string getReqSig(json &req);
   std::string getReplySig(json &reply);
   void processCommandReply(json &reply);
 public:
   void Init(std::string apiKey);
   void OnExtLoad();
-  void RegisterRPCMethod(std::string name, std::shared_ptr<RPCMethod> method);
-  void HandleRequest(std::string body, request_callback callback);
-  void HandleReply(std::string body);
-  void RegisterServer(std::string name, std::shared_ptr<Server> server);
+  void RegisterRPCMethod(const std::string name, std::shared_ptr<RPCMethod> method);
+  void HandleRequest(const std::string &body, request_callback callback);
+  void HandleReply(const std::string &body);
+  void RegisterServer(const std::string name, std::shared_ptr<Server> server);
   const std::unordered_map<std::string, std::shared_ptr<Server>>& GetServers();
-  RPCReqResult SendRequest(std::string target, json &req, RPCCall *call);
+  RPCReqResult SendRequest(const std::string &target, json &req, RPCCall *call);
   void SendBroadcast(json &req);
 };
 

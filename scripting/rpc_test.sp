@@ -13,7 +13,19 @@ public void OnPluginStart() {
   RegServerCmd("rpc_test", rpcTest);
   RegServerCmd("rpc_print_servers", rpcPrintServers);
   RegServerCmd("rpc_broadcast", rpcBroadcast);
+  RegServerCmd("rpc_test_json", invalidJson);
   RPCRegisterMethod("TestMethod", commandCallback, ParameterType:String);
+}
+
+public Action invalidJson(int args) {
+  JSON json = new JSON();
+  json.PushString("Hello world");
+  JSON res = json.GetArrayJSON(0);
+  json.Close();
+  PrintToServer("res: %d", res.GetArrayInt(0));
+  res.Close();
+
+  return Plugin_Handled;
 }
 
 public Action rpcTest(int args) {
