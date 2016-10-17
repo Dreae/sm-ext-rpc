@@ -26,7 +26,8 @@
   sec.pIdentity = myself->GetIdentity(); \
   auto herr = handlesys->ReadHandle(hndl, g_RPCCallType, &sec, reinterpret_cast<void **>(&obj)); \
   if (herr != HandleError_None) { \
-    return pContext->ThrowNativeError("Invalid RPCCall handle %x (error %d)", hndl, herr); \
+    pContext->ReportError("Invalid RPCCall handle %x (error %d)", hndl, herr); \
+    return 0; \
   }
 
 HandleType_t g_RPCCallType;
@@ -91,7 +92,7 @@ static cell_t native_RPCCallSend(IPluginContext *pContext, const cell_t *params)
 
   auto callback = pContext->GetFunctionById((funcid_t)params[3]);
   if (!callback) {
-    pContext->ThrowNativeError("Invalid RPC callback specified");
+    pContext->ReportError("Invalid RPC callback specified");
     return 0;
   }
 
@@ -103,7 +104,7 @@ static cell_t native_RPCCallSend(IPluginContext *pContext, const cell_t *params)
   auto res = obj->Send(std::string(server)); 
   
   if (res == RPCReqResult_UnknownServer) {
-    pContext->ThrowNativeError("Error: Unknown Server %s", server);
+    pContext->ReportError("Error: Unknown Server %s", server);
     return 0;
   } else {
     return 1;
@@ -119,7 +120,7 @@ static cell_t native_RPCCallNotify(IPluginContext *pContext, const cell_t *param
   auto res = obj->Notify(std::string(server));
   
   if (res == RPCReqResult_UnknownServer) {
-    pContext->ThrowNativeError("Error: Unknown Server %s", server);
+    pContext->ReportError("Error: Unknown Server %s", server);
     return 0;
   } else {
     return 1;
@@ -143,7 +144,8 @@ static cell_t native_RPCCallSetParamsJSON(IPluginContext *pContext, const cell_t
   json *j;
   auto jsonErr = handlesys->ReadHandle(jsonHandle, g_JSONType, &jsonSec, reinterpret_cast<void **>(&j));
   if(jsonErr != HandleError_None) {
-    pContext->ThrowNativeError("Invalid JSON handle %x (error %d)", jsonHandle, jsonErr);
+    pContext->ReportError("Invalid JSON handle %x (error %d)", jsonHandle, jsonErr);
+    return 0;
   }
 
   obj->SetArgsJSON(j);

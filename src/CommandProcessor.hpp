@@ -45,6 +45,7 @@ public:
   void HandleRequest(const std::string &body, request_callback callback);
   void HandleReply(const std::string &body);
   void RegisterServer(const std::string name, std::shared_ptr<Server> server);
+  std::shared_ptr<Server> GetServer(const std::string name);
   const std::unordered_map<std::string, std::shared_ptr<Server>>& GetServers();
   RPCReqResult SendRequest(const std::string &target, json &req, RPCCall *call);
   void SendBroadcast(json &req);
