@@ -14,6 +14,7 @@ public void OnPluginStart() {
   RegServerCmd("rpc_print_servers", rpcPrintServers);
   RegServerCmd("rpc_broadcast", rpcBroadcast);
   RegServerCmd("rpc_test_json", invalidJson);
+  RegServerCmd("rpc_add_server", addServer);
   RPCRegisterMethod("TestMethod", commandCallback, ParameterType:String);
 }
 
@@ -67,6 +68,23 @@ public Action rpcBroadcast(int args) {
   call.SetParams(jArgs);
   jArgs.Close();
   call.Broadcast();
+}
+
+public Action addServer(int args) {
+  char serverName[128];
+  GetCmdArg(1, serverName, sizeof(serverName));
+
+  char serverAddress[32];
+  GetCmdArg(2, serverAddress, sizeof(serverAddress));
+
+  char portStr[12];
+  GetCmdArg(3, portStr, sizeof(portStr));
+
+  int port = StringToInt(portStr);
+
+  RPCAddServer(serverName, serverAddress, port);
+
+  return Plugin_Continue;
 }
 
 public void replyCallback(JSON result) {

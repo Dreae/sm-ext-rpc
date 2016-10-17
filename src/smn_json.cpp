@@ -28,7 +28,8 @@ using json = nlohmann::json;
   sec.pIdentity = myself->GetIdentity(); \
   auto herr = handlesys->ReadHandle(hndl, g_JSONType, &sec, reinterpret_cast<void **>(&obj)); \
   if (herr != HandleError_None) { \
-    return pContext->ThrowNativeError("Invalid JSON handle %x (error %d)", hndl, herr); \
+    pContext->ReportError("Invalid JSON handle %x (error %d)", hndl, herr); \
+    return 0; \
   }
 
 
@@ -124,7 +125,8 @@ static cell_t native_SetJSON_JSON(IPluginContext *pContext, const cell_t *params
   sec2.pIdentity = myself->GetIdentity(); 
   auto herr2 = handlesys->ReadHandle(hndl2, g_JSONType, &sec2, reinterpret_cast<void **>(&obj2));
   if (herr2 != HandleError_None) {
-      return pContext->ThrowNativeError("Invalid JSON handle %x (error %d)", hndl2, herr2);
+      pContext->ReportError("Invalid JSON handle %x (error %d)", hndl2, herr2);
+      return 0;
   }
 
   char *key;
@@ -235,7 +237,8 @@ static cell_t native_PushJSON_JSON(IPluginContext *pContext, const cell_t *param
   sec2.pIdentity = myself->GetIdentity();
   auto herr2 = handlesys->ReadHandle(hndl2, g_JSONType, &sec2, reinterpret_cast<void **>(&obj2));
   if (herr2 != HandleError_None) {
-    return pContext->ThrowNativeError("Invalid JSON handle %x (error %d)", hndl2, herr2);
+    pContext->ReportError("Invalid JSON handle %x (error %d)", hndl2, herr2);
+    return 0;
   }
 
   obj->push_back(*obj2);

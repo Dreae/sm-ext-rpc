@@ -34,6 +34,10 @@ void CommandProcessor::RegisterServer(const std::string name, std::shared_ptr<Se
   this->servers[name] = server;
 }
 
+std::shared_ptr<Server> CommandProcessor::GetServer(const std::string name) {
+  return this->servers[name];
+}
+
 RPCReqResult CommandProcessor::SendRequest(const std::string &target, json &req, RPCCall *call) {
   auto server = this->servers[target];
   if(!server) {
@@ -221,7 +225,7 @@ void CommandProcessor::OnExtLoad() {
 cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
   auto callback = pContext->GetFunctionById((funcid_t)params[2]);
   if (!callback) {
-    pContext->ThrowNativeError("Invalid RPC callback specified");
+    pContext->ReportError("Invalid RPC callback specified");
   }
 
   auto paramCount = params[0];
@@ -254,8 +258,35 @@ cell_t RPCGetServers(IPluginContext *pContext, const cell_t *params) {
   return hndl;
 }
 
+// native void RPCAddServer(const char server[], const char address[], int port);
+cell_t RPCAddServer(IPluginContext *pContext, const cell_t *params) {
+  char *server_name;
+  pContext->LocalToString(params[1], &server_name);
+
+  char *server_address;
+  pContext->LocalToString(params[2], &server_address);
+
+  auto port = params[3];
+
+  auto server_str = std::string(server_name);
+  auto current_server = rpcCommandProcessor.GetServer(server_str);
+  if(current_server) {
+    pContext->ReportError("Server %s already exists", server_name);
+    return 0;
+  }
+
+  auto server = std::make_shared<Server>(server_str, port);
+
+  server->Connect(nullptr);
+  eventLoop.RegisterService(server);
+  rpcCommandProcessor.RegisterServer(server_str, server);
+
+  return 1;
+}
+
 const sp_nativeinfo_t smrpc_natives[] = {
   {"RPCRegisterMethod", RPCRegisterMethod},
   {"RPCGetServers", RPCGetServers},
+  {"RPCAddServer", RPCAddServer},
   {NULL, NULL}
 };

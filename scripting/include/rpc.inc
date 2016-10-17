@@ -258,6 +258,16 @@ native void RPCRegisterMethod(const char[] name, RPCCallback callback, Parameter
  */
 native JSON RPCGetServers();
 
+/**
+ * Registers a new server for making RPC calls.
+ *
+ * @param name          The name the new server will be registered as, used
+ *                      for making calls to this server
+ * @param address       The IP address of the new server
+ * @param port          The port of the new server
+ */
+native void RPCAddServer(const char[] name, const char[] address, int port);
+
 public Extension:__ext_smsock = {
 	name = "RPC",
 	file = "rpc.ext",
