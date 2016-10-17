@@ -142,8 +142,12 @@ static cell_t native_GetJSONInt(IPluginContext *pContext, const cell_t *params) 
   char *key;
   pContext->LocalToString(params[2], &key);
 
-  int res = (*obj)[key];
-  return res;
+  try {
+    return (*obj)[key].get<int>();
+  } catch (std::exception e) {
+    pContext->ReportError("Object value at %s is not an int", key);
+    return 0;
+  }
 }
 
 static cell_t native_GetJSONFloat(IPluginContext *pContext, const cell_t *params) {
@@ -152,8 +156,12 @@ static cell_t native_GetJSONFloat(IPluginContext *pContext, const cell_t *params
   char *key;
   pContext->LocalToString(params[2], &key);
 
-  float res = (*obj)[key];
-  return sp_ftoc(res);
+  try {
+    return sp_ftoc((*obj)[key].get<float>());
+  } catch (std::exception e) {
+    pContext->ReportError("Object value at %s is not a float", key);
+    return 0;
+  }
 }
 
 static cell_t native_GetJSONBool(IPluginContext *pContext, const cell_t *params) {
@@ -162,8 +170,12 @@ static cell_t native_GetJSONBool(IPluginContext *pContext, const cell_t *params)
   char *key;
   pContext->LocalToString(params[2], &key);
 
-  bool res = (*obj)[key];
-  return res;
+  try {
+    return (*obj)[key].get<bool>();
+  } catch (std::exception e) {
+    pContext->ReportError("Object value at %s is not a boolean", key);
+    return 0;
+  }
 }
 
 static cell_t native_GetJSONString(IPluginContext *pContext, const cell_t *params) {
@@ -171,6 +183,11 @@ static cell_t native_GetJSONString(IPluginContext *pContext, const cell_t *param
 
   char *key;
   pContext->LocalToString(params[2], &key);
+
+  if (!(*obj)[key].is_string()) {
+    pContext->ReportError("Object value at %s is not a string");
+    return 0;
+  }
 
   std::string res = (*obj)[key];
   pContext->StringToLocal(params[3], params[4], res.c_str());
@@ -249,6 +266,11 @@ static cell_t native_GetArrayString(IPluginContext *pContext, const cell_t *para
   READ_HANDLE(pContext, params);
 
   int pos = params[2];
+
+  if (!(*obj)[pos].is_string()) {
+    pContext->ReportError("Array value at %d is not a string", pos);
+    return 0;
+  }
   
   std::string res = (*obj)[pos];
   pContext->StringToLocal(params[3], params[4], res.c_str());
@@ -257,23 +279,35 @@ static cell_t native_GetArrayString(IPluginContext *pContext, const cell_t *para
 
 static cell_t native_GetArrayInt(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
-
-  int res = (*obj)[params[2]];
-  return res;
+  
+  try {
+    return (*obj)[params[2]].get<int>();
+  } catch (std::exception e) {
+    pContext->ReportError("Array value at %d is not an int", params[2]);
+    return 0;
+  }
 }
 
 static cell_t native_GetArrayFloat(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
 
-  float res = (*obj)[params[2]];
-  return res;
+  try {
+    return sp_ftoc((*obj)[params[2]].get<float>());
+  } catch (std::exception e) {
+    pContext->ReportError("Array value at %d is not a float", params[2]);
+    return 0;
+  }
 }
 
 static cell_t native_GetArrayBool(IPluginContext *pContext, const cell_t *params) {
   READ_HANDLE(pContext, params);
 
-  bool res = (*obj)[params[2]];
-  return res;
+  try {
+    return (*obj)[params[2]].get<bool>();
+  } catch (std::exception e) {
+    pContext->ReportError("Array value at %d is not a boolean", params[2]);
+    return 0;
+  }
 }
 
 static cell_t native_GetArrayJSON(IPluginContext *pContext, const cell_t *params) {
