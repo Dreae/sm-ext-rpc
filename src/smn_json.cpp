@@ -326,6 +326,52 @@ static cell_t native_GetArraySize(IPluginContext *pContext, const cell_t *params
   return obj->size();
 }
 
+static cell_t native_AsInt(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  try {
+    return obj->get<int>();
+  } catch(std::exception e) {
+    pContext->ReportError("JSON value is not an int");
+    return 0;
+  }
+}
+
+static cell_t native_AsFloat(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  try {
+    return sp_ftoc(obj->get<float>());
+  } catch(std::exception e) {
+    pContext->ReportError("JSON value is not a float");
+    return 0;
+  }
+}
+
+static cell_t native_AsBool(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  try {
+    return obj->get<bool>();
+  } catch(std::exception e) {
+    pContext->ReportError("JSON value is not a boolean");
+    return 0;
+  }
+}
+
+static cell_t native_AsString(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  if(!obj->is_string()) {
+    pContext->ReportError("JSON value is not a string");
+    return 0;
+  }
+
+  std::string res = obj->get<std::string>();
+  pContext->StringToLocal(params[2], params[3], res.c_str());
+  return 1;
+}
+
 static cell_t native_CreateJSON(IPluginContext *pContext, const cell_t *params) {
   auto context = new json;
   auto hndl = handlesys->CreateHandle(g_JSONType, context, pContext->GetIdentity(), myself->GetIdentity(), NULL);
@@ -356,5 +402,9 @@ const sp_nativeinfo_t smrpc_json_natives[] = {
   { "JSON.GetArrayBool", native_GetArrayBool },
   { "JSON.GetArrayJSON", native_GetArrayJSON },
   { "JSON.GetArraySize", native_GetArraySize },
+  { "JSON.AsInt", native_AsInt },
+  { "JSON.AsFloat", native_AsFloat },
+  { "JSON.AsBool", native_AsBool },
+  { "JSON.AsString", native_AsString },
   { NULL, NULL }
 };
