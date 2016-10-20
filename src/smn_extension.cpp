@@ -15,8 +15,6 @@ public:
 
 RPCNatives natives;
 
-boost::uuids::random_generator uuidGenerator;
-
 // native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
 static cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
   auto callback = pContext->GetFunctionById((funcid_t)params[2]);
