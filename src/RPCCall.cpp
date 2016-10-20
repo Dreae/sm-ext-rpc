@@ -60,7 +60,6 @@ RPCReqResult RPCCall::Send(std::string server) {
   }
 
   auto res = rpcCommandProcessor.SendRequest(server, req, this);
-  this->FreeHandle();
 
   return res;
 }
