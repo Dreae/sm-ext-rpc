@@ -1,6 +1,8 @@
 #include "Exstension.hpp"
 #include "rpc_handletypes.hpp"
 #include "CommandProcessor.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 extern const sp_nativeinfo_t smrpc_natives[];
 
@@ -12,6 +14,8 @@ public:
 };
 
 RPCNatives natives;
+
+boost::uuids::random_generator uuidGenerator;
 
 // native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
 static cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
@@ -123,6 +127,14 @@ static cell_t RPCGetServerAddress(IPluginContext *pContext, const cell_t *params
   return 1;
 }
 
+// native void RPCGetUUID(char[] buffer, int maxSize);
+static cell_t RPCGetUUID(IPluginContext *pContext, const cell_t *params) {
+  auto uuid = boost::lexical_cast<std::string>(uuidGenerator());
+
+  pContext->StringToLocal(params[1], params[2], uuid.c_str());
+  return 1;
+}
+
 const sp_nativeinfo_t smrpc_natives[] = {
   {"RPCRegisterMethod", RPCRegisterMethod},
   {"RPCGetServers", RPCGetServers},
@@ -130,5 +142,6 @@ const sp_nativeinfo_t smrpc_natives[] = {
   {"RPCRemoveServer", RPCRemoveServer},
   {"RPCGetServerAddress", RPCGetServerAddress},
   {"RPCGetServerPort", RPCGetServerPort},
+  {"RPCGetUUID", RPCGetUUID},
   {NULL, NULL}
 };

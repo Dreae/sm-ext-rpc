@@ -305,6 +305,14 @@ native void RPCGetServerAddress(const char[] name, char[] address, int maxSize);
  */
 native int RPCGetLocalPort();
 
+/**
+ * Generates a UUID v4
+ *
+ * @param buffer        The buffer to store the newly generated UUID in
+ * @param maxLength     The maximum size of the buffer
+ */
+native void RPCGetUUID(char[] buffer, int maxSize);
+
 public Extension:__ext_smsock = {
 	name = "RPC",
 	file = "rpc.ext",
