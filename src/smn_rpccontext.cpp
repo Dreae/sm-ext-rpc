@@ -106,9 +106,17 @@ static cell_t native_SetReturnJSON(IPluginContext *pContext, const cell_t *param
   return 1;
 }
 
+static cell_t native_GetRemoteAddress(IPluginContext *pContext, const cell_t *params) {
+  READ_HANDLE(pContext, params);
+
+  pContext->StringToLocal(params[2], params[3], context->remote.c_str());
+  return 1;
+}
+
 const sp_nativeinfo_t smrpc_context_natives[] = {
   {"RPCContext.GetParams", native_GetParams},
   {"RPCContext.SetReturn", native_SetReturnJSON},
+  {"RPCContext.GetRemoteAddress", native_GetRemoteAddress},
   {"RPCContext.Done", native_FinishCall},
   {NULL, NULL}
 };

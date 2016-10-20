@@ -15,7 +15,7 @@ public void OnPluginStart() {
   RegServerCmd("rpc_broadcast", rpcBroadcast);
   RegServerCmd("rpc_test_json", invalidJson);
   RegServerCmd("rpc_add_server", addServer);
-  RPCRegisterMethod("TestMethod", commandCallback, ParameterType:String);
+  RPCRegisterMethod("TestMethod", commandCallback, ParameterType:Json);
 }
 
 public Action invalidJson(int args) {
@@ -98,10 +98,12 @@ public void replyCallback(JSON result) {
 public void commandCallback(RPCContext context) {
   JSON params = context.GetParams();
   char message[256];
+  char address[64];
+  context.GetRemoteAddress(address, sizeof(address));
   params.GetArrayString(0, message, sizeof(message));
   params.Close();
   
-  PrintToServer("Got called by test server with message: %s", message);
+  PrintToServer("Got called by %s server with message: %s", address, message);
   JSON ret = new JSON();
   ret.SetString("message", message);
   context.SetReturn(ret);

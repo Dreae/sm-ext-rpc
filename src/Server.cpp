@@ -93,3 +93,11 @@ void Server::do_read() {
 void Server::Run() {
   this->service->poll();
 }
+
+int Server::GetPort() {
+  return this->port;
+}
+
+const std::string &Server::GetAddress() {
+  return this->address;
+}

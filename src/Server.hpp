@@ -36,5 +36,7 @@ public:
   void Send(std::string msg);
   void Connect(std::function<void()> callback);
   void Run();
+  int GetPort();
+  const std::string &GetAddress();
 };
 #endif //_RPC_Server

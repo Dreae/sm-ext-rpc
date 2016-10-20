@@ -26,8 +26,9 @@ void SocketHandler::do_read() {
   boost::asio::async_read_until(socket, *this->data, PACKET_TERMINATOR, [this, self](boost::system::error_code ec, std::size_t length) {
     if (!ec) {
       std::string body(boost::asio::buffer_cast<const char*>(this->data->data()), length);
+      auto remote = self->socket.remote_endpoint().address().to_string();
 
-      rpcCommandProcessor.HandleRequest(body, [this, self](std::shared_ptr<json> res) {
+      rpcCommandProcessor.HandleRequest(remote, body, [this, self](std::shared_ptr<json> res) {
         this->do_write(res->dump());
       });
 

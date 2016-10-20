@@ -9,7 +9,7 @@ enum ParameterType {
   Int,
   Bool,
   Float,
-  JSON
+  Json
 }
 
 methodmap RPCContext < Handle {
@@ -28,6 +28,12 @@ methodmap RPCContext < Handle {
   //                      copied, the original value will still
   //                      need to be closed.
   public native void SetReturn(JSON value);
+
+  // Gets the address of the remote server as a string
+  //
+  // @param address       The buffer to store the address in
+  // @param maxSize       The maximum size of the buffer
+  public native void GetRemoteAddress(char[] buffer, int maxSize);
 
   // Signals that you are done handling this RPC request. Calling this
   // method closes the RPCContext handle, and sends the return value
@@ -267,6 +273,37 @@ native JSON RPCGetServers();
  * @param port          The port of the new server
  */
 native void RPCAddServer(const char[] name, const char[] address, int port);
+
+/**
+ * Removes a server from the list of known servers.
+ *
+ * @param name          The name of the server to remove.
+ */
+native void RPCRemoveServer(const char[] name);
+
+/**
+ * Gets the port of a known server
+ *
+ * @param name          The name of the server to look up the port of
+ * @return              The port the named server is listening on
+ */
+native int RPCGetServerPort(const char[] name);
+
+/**
+ * Gets the address of a known server
+ *
+ * @param name          The name of the server to look up the address of
+ * @param address       The buffer to store the address in
+ * @param maxSize       The maximum size of the buffer
+ */
+native void RPCGetServerAddress(const char[] name, char[] address, int maxSize);
+
+/**
+ * Gets the listen port of the local server
+ *
+ * @return              The port the current server is listening on
+ */
+native int RPCGetLocalPort();
 
 public Extension:__ext_smsock = {
 	name = "RPC",

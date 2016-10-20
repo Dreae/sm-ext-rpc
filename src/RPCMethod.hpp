@@ -50,7 +50,7 @@ private:
 public:
   RPCMethod(char *name, IPluginContext *owningPlugin, IPluginFunction *callback, std::unique_ptr<std::vector<ParamType>> paramTypes);
   bool ValidateArguments(json j);
-  void Call(json params, std::function<void(json)> callback);
+  void Call(const std::string &remote, json params, std::function<void(json)> callback);
 };
 
 #endif // !_RPC_RPCMethod

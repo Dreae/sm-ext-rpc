@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(rpc)
 
-set(CMAKE_BUILD_TYPE Release)
-
 set(SOURCE_FILES
         src/sdk/smsdk_ext.cpp
         src/CommandProcessor.cpp
@@ -17,7 +15,8 @@ set(SOURCE_FILES
         src/smn_json.cpp
         src/Crypto.cpp
         src/RPCCall.cpp 
-        src/smn_rpccall.cpp)
+        src/smn_rpccall.cpp
+        src/smn_extension.cpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -D_LINUX -DSOURCEMOD_BUILD -fno-strict-aliasing -m32")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -funroll-loops -s")
