@@ -15,6 +15,7 @@ public void OnPluginStart() {
   RegServerCmd("rpc_broadcast", rpcBroadcast);
   RegServerCmd("rpc_test_json", invalidJson);
   RegServerCmd("rpc_add_server", addServer);
+  RegServerCmd("rpc_get_uuid", getUUID);
   RPCRegisterMethod("TestMethod", commandCallback, ParameterType:Json);
 }
 
@@ -110,4 +111,12 @@ public void commandCallback(RPCContext context) {
   context.Done();
 
   ret.Close();
+}
+
+public Action getUUID(int args) {
+  char uuid[128];
+  RPCGetUUID(uuid, sizeof(uuid));
+  PrintToServer("Got UUID %s", uuid);
+
+  return Plugin_Handled;
 }
