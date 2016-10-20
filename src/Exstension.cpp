@@ -40,7 +40,7 @@ bool Extension::SDK_OnLoad(char *error, size_t err_max, bool late) {
     strcpy(error, "No signing key provided in configuration");
     return false;
   } else {
-    eventLoop.Init(config.port);
+    eventLoop.Init(config.address, config.port);
     rpcCommandProcessor.Init(config.secret);
 
     for (auto n : config.servers) {

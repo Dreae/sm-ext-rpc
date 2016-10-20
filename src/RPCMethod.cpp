@@ -25,8 +25,8 @@ RPCMethod::RPCMethod(char *name, IPluginContext *owningPlugin, IPluginFunction* 
   this->callback = callback;
 }
 
-void RPCMethod::Call(json params, std::function<void(json)> callback) {
-  auto context = new RPCContext(params, callback); // Free'd by SourceMod in OnHandleDestroy
+void RPCMethod::Call(const std::string &remote, json params, std::function<void(json)> callback) {
+  auto context = new RPCContext(remote, params, callback); // Free'd by SourceMod in OnHandleDestroy
   auto hndl = handlesys->CreateHandle(g_RPCContextType, context, this->owningPlugin->GetIdentity(), myself->GetIdentity(), NULL);
   this->callback->PushCell(hndl);
 
@@ -44,6 +44,7 @@ bool RPCMethod::ValidateArguments(json j) {
       return false;
     }
   }
+  return true;
 }
 
 bool RPCMethod::checkType(ParamType type, json j) {

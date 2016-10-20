@@ -45,7 +45,7 @@ public:
   void SetHandle(Handle_t handle);
   void FreeHandle();
   void SetArgsJSON(json *j);
-  void HandleReply(json *res);
+  void HandleReply(const json &res);
   RPCReqResult Send(std::string server);
   RPCReqResult Notify(std::string server);
   void Broadcast();

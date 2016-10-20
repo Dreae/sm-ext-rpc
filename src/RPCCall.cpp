@@ -79,10 +79,11 @@ RPCReqResult RPCCall::Notify(std::string server) {
   return res;
 }
 
-void RPCCall::HandleReply(json *res) {
+void RPCCall::HandleReply(const json &res) {
   if (this->callback) {
-    json *reply = new json((*res)["result"]);
-    auto hndl = handlesys->CreateHandle(g_JSONType, reply, this->callback->GetParentContext()->GetIdentity(), myself->GetIdentity(), NULL);
+    json *reply = new json(res["result"]);
+
+    auto hndl = handlesys->CreateHandle(g_JSONType, reply, this->owner, myself->GetIdentity(), NULL);
     this->callback->PushCell(hndl);
     this->callback->Execute(nullptr);
   }

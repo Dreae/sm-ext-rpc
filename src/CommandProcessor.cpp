@@ -20,7 +20,6 @@
 #include "rpc_handletypes.hpp"
 
 CommandProcessor rpcCommandProcessor;
-extern const sp_nativeinfo_t smrpc_natives[];
 
 void CommandProcessor::Init(std::string apiKey) {
   this->apiKey = apiKey;
@@ -36,6 +35,10 @@ void CommandProcessor::RegisterServer(const std::string name, std::shared_ptr<Se
 
 std::shared_ptr<Server> CommandProcessor::GetServer(const std::string name) {
   return this->servers[name];
+}
+
+void CommandProcessor::RemoveServer(const std::string name) {
+  this->servers.erase(name);
 }
 
 RPCReqResult CommandProcessor::SendRequest(const std::string &target, json &req, RPCCall *call) {
@@ -83,8 +86,10 @@ void CommandProcessor::processCommandReply(json &reply) {
   if(!reply["id"].is_null() && reply["id"].is_string()) {
     std::string id = reply["id"];
     try {
-      auto call = this->outstandingCalls[id];
-      call->HandleReply(&reply);
+      auto call = this->outstandingCalls.at(id);
+      call->HandleReply(reply);
+      
+      this->outstandingCalls.erase(id);
     } catch(std::out_of_range e) {
       smutils->LogError(myself, "Got reply, but there is no record for request id %s", id.c_str());
     }
@@ -107,7 +112,7 @@ void CommandProcessor::HandleReply(const std::string &body) {
   }
 }
 
-void CommandProcessor::HandleRequest(const std::string &req, request_callback cb) {
+void CommandProcessor::HandleRequest(const std::string &remote, const std::string &req, request_callback cb) {
   try {
     auto j = json::parse(req);
     if (j.is_array()) {
@@ -161,7 +166,7 @@ void CommandProcessor::HandleRequest(const std::string &req, request_callback cb
       }
 
       auto id = j["id"];
-      method->Call(j["params"], [cb, id, notification, this](json retval) {
+      method->Call(remote, j["params"], [cb, id, notification, this](json retval) {
         if (!notification) {
           json resp;
           resp["jsonrpc"] = "2.0";
@@ -216,77 +221,3 @@ std::string CommandProcessor::getReplySig(json &reply) {
 const std::unordered_map<std::string, std::shared_ptr<Server>>& CommandProcessor::GetServers() {
   return this->servers;
 }
-
-void CommandProcessor::OnExtLoad() {
-  sharesys->AddNatives(myself, smrpc_natives);
-}
-
-// native void RPCRegisterMethod(char[] name, RPCCallback callback, ParameterType ...);
-cell_t RPCRegisterMethod(IPluginContext *pContext, const cell_t *params) {
-  auto callback = pContext->GetFunctionById((funcid_t)params[2]);
-  if (!callback) {
-    pContext->ReportError("Invalid RPC callback specified");
-  }
-
-  auto paramCount = params[0];
-
-  char *methodName;
-  pContext->LocalToString(params[1], &methodName);
-
-  auto paramTypes = std::unique_ptr<std::vector<ParamType>>(new std::vector<ParamType>());
-  for (int c = 3; c < paramCount + 1; c++) {
-    cell_t *paramType;
-    pContext->LocalToPhysAddr(params[c], &paramType);
-    paramTypes->push_back(static_cast<ParamType>(*paramType));
-  }
-  auto method = std::make_shared<RPCMethod>(methodName, pContext, callback, std::move(paramTypes));
-  rpcCommandProcessor.RegisterRPCMethod(methodName, method);
-
-  return false;
-}
-
-// native void RPCGetServers();
-cell_t RPCGetServers(IPluginContext *pContext, const cell_t *params) {
-  auto server_list = rpcCommandProcessor.GetServers();
-  auto servers = new json;
-  for (auto it = server_list.begin(); it != server_list.end(); ++it) {
-    servers->push_back(it->first);
-  }
-
-  auto hndl = handlesys->CreateHandle(g_JSONType, servers, pContext->GetIdentity(), myself->GetIdentity(), NULL);
-
-  return hndl;
-}
-
-// native void RPCAddServer(const char server[], const char address[], int port);
-cell_t RPCAddServer(IPluginContext *pContext, const cell_t *params) {
-  char *server_name;
-  pContext->LocalToString(params[1], &server_name);
-
-  char *server_address;
-  pContext->LocalToString(params[2], &server_address);
-
-  auto port = params[3];
-
-  auto server_str = std::string(server_name);
-  auto current_server = rpcCommandProcessor.GetServer(server_str);
-  if(current_server) {
-    pContext->ReportError("Server %s already exists", server_name);
-    return 0;
-  }
-
-  auto server = std::make_shared<Server>(server_str, port);
-
-  server->Connect(nullptr);
-  eventLoop.RegisterService(server);
-  rpcCommandProcessor.RegisterServer(server_str, server);
-
-  return 1;
-}
-
-const sp_nativeinfo_t smrpc_natives[] = {
-  {"RPCRegisterMethod", RPCRegisterMethod},
-  {"RPCGetServers", RPCGetServers},
-  {"RPCAddServer", RPCAddServer},
-  {NULL, NULL}
-};

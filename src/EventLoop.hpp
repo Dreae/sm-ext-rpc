@@ -38,7 +38,7 @@ private:
   std::vector<std::shared_ptr<IOService>> services;
 public:
   EventLoop() { };
-  void Init(int port);
+  void Init(const std::string &address, int port);
   void RegisterService(std::shared_ptr<IOService> service);
   void Run();
   void OnExtLoad();

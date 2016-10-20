@@ -30,8 +30,9 @@ private:
   json retval;
 public:
   json params;
+  std::string remote;
 
-  RPCContext(json params, std::function<void(json)> callback);
+  RPCContext(const std::string &remote, json params, std::function<void(json)> callback);
   void finish();
 
   template <typename T> void SetReturnValue(T val) {

@@ -16,9 +16,10 @@
 
 #include "RPCContext.hpp"
 
-RPCContext::RPCContext(json params, std::function<void(json)> callback) {
+RPCContext::RPCContext(const std::string &remote, json params, std::function<void(json)> callback) {
   this->params = params;
   this->callback = callback;
+  this->remote = std::string(remote);
 }
 
 void RPCContext::finish() {
