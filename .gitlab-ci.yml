@@ -1,0 +1,13 @@
+image: "fedora:27"
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+  - dnf check-update && dnf -y install clang cmake openssl-static.i686 boost-static.i686 zlib-static.i686 boost-devel openssl-devel
+
+build:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
