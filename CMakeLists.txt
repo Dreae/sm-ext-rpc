@@ -30,5 +30,5 @@ link_directories($ENV{BOOST_DIR}/stage/lib $ENV{OPENSSL_DIR})
 
 add_library(rpc.ext SHARED ${SOURCE_FILES})
 
-target_link_libraries(rpc.ext -lpthread -Wl,--no-undefined -Wl,-Bstatic -lcrypto -static-libgcc -lboost_thread -lboost_system -lstdc++ -Wl,-Bdynamic -lm -ldl)
+target_link_libraries(rpc.ext -lpthread -Wl,--no-undefined -Wl,-Bstatic -lcrypto -lz -static-libgcc -lboost_thread -lboost_system -lstdc++ -Wl,-Bdynamic -lm -ldl)
 set_target_properties(rpc.ext PROPERTIES PREFIX "")
