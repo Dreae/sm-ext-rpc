@@ -3,13 +3,28 @@ image: "fedora:27"
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-before_script:
+build:linux:
+  before_script:
   - dnf -y install gcc gcc-c++
   - dnf -y install cmake openssl-static.i686 boost-static.i686 zlib-static.i686 glibc-static.i686 libstdc++-static.i686 glibc-devel.i686 boost-devel openssl-devel
-
-build:
   script:
-    - mkdir build
-    - cd build
-    - cmake ..
-    - make
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  artifacts:
+    paths:
+    - build/rpc.ext.so
+
+build:windows:
+  before_script:
+  - dnf -y install mingw32-gcc mingw32-gcc-c++
+  - dnf -y install cmake mingw32-boost-static mingw32-zlib-static mingw32-openssl-static
+  script:
+  - mkdir build
+  - cd build
+  - CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ cmake -DTARGET=windows ..
+  - make
+  artifacts:
+    paths:
+    - build/rpc.ext.dll
