@@ -4,7 +4,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 before_script:
-  - dnf -y install clang cmake openssl-static.i686 boost-static.i686 zlib-static.i686 boost-devel openssl-devel
+  - dnf -y install clang cmake openssl-static.i686 boost-static.i686 zlib-static.i686 glibc-static.i686 libstdc++-static.i686 glibc-devel boost-devel openssl-devel
 
 build:
   script:
