@@ -10,7 +10,7 @@ build:linux:
   script:
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
   - make
   artifacts:
     paths:
@@ -23,7 +23,7 @@ build:windows:
   script:
   - mkdir build
   - cd build
-  - CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ cmake -DTARGET=windows ..
+  - CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ cmake -DTARGET=windows -DCMAKE_BUILD_TYPE=Release ..
   - make
   artifacts:
     paths:
