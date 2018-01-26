@@ -47,7 +47,8 @@ bundle:windows:
   - cp rpc.ext.dll csgo/addons/sourcemod/extensions/
   - zip -r rpc.zip bin/ csgo/
   artifacts:
-  - build/rpc.zip
+    paths:
+    - build/rpc.zip
   dependencies:
   - build:windows
 
@@ -59,6 +60,7 @@ bundle:linux:
   - cp rpc.ext.so csgo/addons/sourcemod/extensions/
   - tar -cf rpc.tar.gz csgo/
   artifacts:
-  - build/rpc.tar.gz
+    paths:
+    - build/rpc.tar.gz
   dependencies:
   - build:linux
