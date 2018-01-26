@@ -25,6 +25,8 @@ build:windows:
   - cd build
   - CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ cmake -DTARGET=windows -DCMAKE_BUILD_TYPE=Release ..
   - make
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll .
   artifacts:
     paths:
     - build/rpc.ext.dll
+    - build/libwinpthread-1.dll
