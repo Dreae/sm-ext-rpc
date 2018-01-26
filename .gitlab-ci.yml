@@ -3,7 +3,12 @@ image: "fedora:27"
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
+stages:
+  - build
+  - bundle
+
 build:linux:
+  stage: build
   before_script:
   - dnf -y install gcc gcc-c++
   - dnf -y install cmake openssl-static.i686 boost-static.i686 zlib-static.i686 glibc-static.i686 libstdc++-static.i686 glibc-devel.i686 boost-devel openssl-devel
@@ -17,6 +22,7 @@ build:linux:
     - build/rpc.ext.so
 
 build:windows:
+  stage: build
   before_script:
   - dnf -y install mingw32-gcc mingw32-gcc-c++
   - dnf -y install cmake mingw32-boost-static mingw32-zlib-static mingw32-openssl-static
@@ -30,3 +36,29 @@ build:windows:
     paths:
     - build/rpc.ext.dll
     - build/libwinpthread-1.dll
+
+bundle:windows:
+  stage: bundle
+  script:
+  - cd build
+  - mkdir -p bin
+  - mkdir -p csgo/addons/sourcemod/extensions
+  - cp libwinpthread-1.dll bin/
+  - cp rpc.ext.dll csgo/addons/sourcemod/extensions/
+  - zip -r rpc.zip bin/ csgo/
+  artifacts:
+  - build/rpc.zip
+  dependencies:
+  - build:windows
+
+bundle:linux:
+  stage: bundle
+  script:
+  - cd build
+  - mkdir -p csgo/addons/sourcemod/extensions
+  - cp rpc.ext.so csgo/addons/sourcemod/extensions/
+  - tar -cf rpc.tar.gz csgo/
+  artifacts:
+  - build/rpc.tar.gz
+  dependencies:
+  - build:linux
